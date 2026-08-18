@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>正宗老淮安古法单机掼蛋</title>
+<meta name="color-scheme" content="light">
+<title>一个人的掼蛋</title>
 <style>
   :root{
     --felt1:#cdebb7; --felt2:#adcf9e;
@@ -58,6 +59,7 @@
   }
   .seat .count.mystery{background:#b9c4bd; color:#333;}
   .seat .done{color:var(--gold); font-weight:700;}
+  .seat .done.rankname{color:#fff; background:#b23a2e; border-radius:4px; padding:0 5px; font-size:12px; margin-left:4px; letter-spacing:1px;} /* 5.0.1：完牌名词徽标 */
   .seat.vseat{flex-direction:column; align-items:center; text-align:center; gap:1px; width:max-content; padding:3px 4px;}
   .seat.vseat .avatar{width:24px; height:24px;}
   .seat.vseat .vname{font-size:12px; font-weight:700; line-height:1.15;}
@@ -190,14 +192,10 @@
     font-weight:900 !important; letter-spacing:0; z-index:1;
     text-shadow:0 1px 0 rgba(0,0,0,.12);
   }
-  .card .joker-num{                      /* 大小王：普通黑体汉字，占方块 60%（大=紫 / 小=绿） */
-    font-size:calc(var(--cell)*.6); color:#111;
-    text-shadow:0 1px 0 rgba(0,0,0,.1);
-  }
-  .card .joker-watermark{                /* 牌面下方衬 50% 淡显「王」字背景，撑满方格 */
+  .card .joker-watermark{                /* 牌面彩色「王」字（大王四色/小王双色），撑满方格，不淡显 */
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-family:"Microsoft YaHei","SimHei","Heiti SC",sans-serif; font-weight:900;
-    font-size:calc(var(--cell)*.95); line-height:1; opacity:.5; z-index:0; pointer-events:none;
+    font-size:calc(var(--cell)*.95); line-height:1; opacity:1; z-index:0; pointer-events:none;
   }
   .card.sel{outline:3px solid var(--gold); transform:translateY(-5px);}
   .card.wild{border-color:#e23a3a; outline:2px solid rgba(226,58,58,.5);}
@@ -231,20 +229,21 @@
   .cell .card{width:100%; height:100%; cursor:pointer;}
   .actions{display:flex; justify-content:center; gap:14px; padding:4px 0 8px;}
   .btn{
-    min-width:96px; padding:9px 20px; border:3px solid #0c1f14; border-radius:6px;
+    min-width:96px; padding:9px 20px; border:1.5px solid #0c1f14; border-radius:6px;
     font-size:16px; font-weight:800; cursor:pointer; touch-action:manipulation;
   }
   .btn.primary{background:var(--gold); color:#5a4300; box-shadow:0 3px 0 #c99f1d;}
   /* 4.6.0：主菜单剧情模式=亮黄、新手教程=浅绿 */
   .btn.story-yellow{background:#ffe600; color:#5a4300; box-shadow:0 3px 0 #c9a900; border-color:#0c1f14;}
   .btn.story-yellow:hover{background:#ffd400; box-shadow:0 3px 0 #b89400;}
-  .btn.tut-lightgreen{background:#a8e6a3; color:#0c2a16; box-shadow:0 3px 0 #6bbf6f; border-color:#0c1f14;}
-  .btn.tut-lightgreen:hover{background:#93d98e; box-shadow:0 3px 0 #5aae5e;}
+  .btn.tut-lightgreen{background:#5cb85e; color:#0a2a14; box-shadow:0 3px 0 #3f8f43; border-color:#0a2a14;} /* 5.0.1：加深绿色，深色字，深色模式下仍清晰 */
+  .btn.tut-lightgreen:hover{background:#4fa852; box-shadow:0 3px 0 #357b39;}
   /* 4.6.0：对战界面座位角色名（随剧情变化，座位标签对家/左家/右家不变） */
   .charname{ font-size:10px; opacity:.9; margin-left:3px; }
   .vseat .vname{ display:flex; flex-direction:column; align-items:center; line-height:1.15; }
   .vseat .charname{ display:block; font-size:10px; opacity:.85; margin:1px 0 0; font-weight:600; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.6); }
-  .btn.ghost{background:rgba(255,255,255,.16); color:#fff; border:3px solid rgba(255,255,255,.5);}
+  .btn.ghost{background:#bfe1ff; color:#0c1f14; border:1.5px solid #0c1f14;}
+  #btnPlay{border-width:3px;} /* 5.0.1：浅蓝底(匹配头像)黑框黑字，出牌后按钮清晰可见 */
   .btn.ghost.on{background:var(--gold); color:#5a4300; border-color:var(--gold);}
   .btn:disabled{opacity:.4; cursor:default;}
   /* 弹窗内的 ghost 按钮（白色面板）需可见：深字 + 浅底 + 深边框 */
@@ -409,11 +408,15 @@ html.narrow-portrait .seat.vseat .vname, html.dev-phone.dev-portrait .seat.vseat
 html.narrow-portrait .seat.vseat .vtag, html.dev-phone.dev-portrait .seat.vseat .vtag,
 html.narrow-portrait .seat.vseat .vrem, html.dev-phone.dev-portrait .seat.vseat .vrem{ font-size:8px; }
 html.narrow-portrait .seat.vseat .count, html.dev-phone.dev-portrait .seat.vseat .count{ min-width:14px; font-size:11px; padding:0 3px; }
+/* 5.0.4：手机竖屏左右家对话框——贴侧列、自头像下延伸至桌面下边缘，不再被 42vh 截断 */
+html.narrow-portrait .mid .side-col, html.dev-phone.dev-portrait .mid .side-col{ position:relative; }
+html.narrow-portrait .seat.vseat, html.dev-phone.dev-portrait .seat.vseat{ position:static; min-height:64px; }
 html.narrow-portrait .bubble.vert-r, html.dev-phone.dev-portrait .bubble.vert-r,
 html.narrow-portrait .bubble.vert-l, html.dev-phone.dev-portrait .bubble.vert-l{
-  writing-mode:horizontal-tb; text-orientation:initial; white-space:normal;
-  left:50%; right:auto; top:calc(100% + 4px); bottom:auto; transform:translateX(-50%);
-  max-width:120px; text-align:center; font-size:10px; line-height:1.2; padding:2px 6px;
+  writing-mode:vertical-rl; text-orientation:upright; white-space:normal;
+  left:50%; right:auto; top:66px; bottom:auto; transform:translateX(-50%);
+  max-height:min(calc(100% - 70px), calc(100vh - 170px)); max-width:none; text-align:center;
+  font-size:12px; line-height:1.5; letter-spacing:1px; padding:5px 6px;
   background:rgba(0,0,0,.72); border-radius:8px; color:#fff; text-shadow:none;
   opacity:0; pointer-events:none; z-index:40;
 }
@@ -435,7 +438,7 @@ html.narrow-portrait #handGrid, html.dev-phone.dev-portrait #handGrid{
   --cell: min(calc((100vw - 36px)/16), calc((100vh - 300px)/4), 28px) !important;
   gap:2px !important;
 }
-html.narrow-portrait .hand-wrap, html.dev-phone.dev-portrait .hand-wrap{ padding:1px 3px; max-height:30vh; overflow:auto; }
+html.narrow-portrait .hand-wrap, html.dev-phone.dev-portrait .hand-wrap{ padding:10px 3px 2px; max-height:32vh; overflow:auto; } /* 5.0.1：顶部留白，避免选中牌上弹被边界裁切 */
 html.narrow-portrait .cell, html.dev-phone.dev-portrait .cell{ border-radius:3px; }
 /* 理牌栏压缩 */
 html.narrow-portrait .sort-bar, html.dev-phone.dev-portrait .sort-bar{ font-size:11px; gap:4px; padding:1px 0; }
@@ -621,8 +624,8 @@ html.narrow-portrait .map-node-btn .seal-c, html.dev-phone.dev-portrait .map-nod
 </script>
 <script>
 /* 多语言词典：zh/en 由代码与 data-* 提供，fr/de/es 见下。增删语言只改此块与 LANGS。 */
-var I18N = {"fr":{"黑桃":" Pique","红桃":" Cœur","梅花":" Trèfle","方片":" Carreau","我":" Toi","右家":" Droite","对家":" Partenaire","左家":" Gauche","大王":" Gros Joker","小王":" Petit Joker","王":" Joker","单张":" Simple","对子":" Paire","三张":" Trio","天王炸":" Bombe des Jokers","炸弹":" Bombe","三带二":" Trio+Paire","同花顺":" Quinte flush","顺子":" Suite","三连对":" Paires consécutives","钢板":" Plaque","看我的！":" Regarde ça !","走一张":" Une carte","小牌开路":" Petites cartes devant","这张稳了":" C'est sûr","来，接招":" Tiens, prends ça","先探探路":" Sonde d'abord","这张不亏":" Pas de perte","清小单，控大单":" Vide les petites, contrôle les grosses","炸弹！轰！":" BOMBE ! Boum !","看我的炸弹":" Voici ma bombe","轰他！":" Boum lui !","一炸解千愁":" Une bombe règle tout","都别动，我炸":" Ne bougez, je bombe","炸得你怀疑人生":" Bombé sans pitié","就这？":" C'est tout ?","这点牌还想赢？":" Tu crois gagner avec ça ?","你这是在送啊":" Tu me donnes tout","哈哈，笑死我了":" Haha, morte de rire","闭着眼都能赢你":" Je te battrais les yeux fermés","我猜你手里没好货":" Je parie que tu n'as rien","下把你也赢不了":" Tu perdras aussi","你这出牌看得我头皮发麻":" Ton jeu me donne la Chair de poule","你是在帮我拆牌吗":" Tu démontes ma main ?","这操作简直教科书反面教材":" Exemple de quoi ne pas faire","队友都救不了你":" Même ton partenaire ne peut te sauver","别炸了别炸了，留着过年啊":" Arrête de bomber, garde-les!","你这牌路比迷宫还绕":" Ton cheminement = labyrinthe","刚才那手谁教你这么打的":" Qui t'a appris ce coup","你这叫勇，不叫会打":" C'est du courage, pas du jeu","输得这么优雅也是本事":" Perdre avec grâce","你是在给我喂牌吗":" Tu me donnes des cartes ?","你这节奏，像极了等公交迟迟不来":" Ton rythme = bus qui n'arrive pas","我都不好意思炸你，给你留点面子":" J'ai honte de te bomber","你手里那两张，我闭眼都知道是啥":" Tes deux cartes, je les devine","打得好！":" Bien joué !","漂亮！":" Magnifique !","厉害啊":" Impressionnant","稳了稳了":" On a ça","大佬带飞":" Porté par le pro","好牌！":" Belles cartes !","就靠你了":" Compte sur toi","这水平没谁了":" Personne ne joue comme toi","跟着你有肉吃":" Suivre, c'est gagner","牛！":" Génial !","神配合！":" Super combo !","这波喂牌绝了":" Ce don était fatal","对家懂我":" Mon partenaire me comprend","太会送了，爱了":" Trop généreux, j'adore","配合天衣无缝":" Coordination parfaite","小单先出，大单控场":" Petites d'abord, grosses contrôlent","情况不明，对子先行":" Si flou, commence par une paire","有王打单，无王打夯":" Avec Jokers, simples ; sans, fort","逢人配，配炸不配单":" Le joker va à la bombe","炸五不炸四，炸七不炸八":" Bombe un 5 pas un 4, un 7 pas un 8","想上游小单走，想下游留单张":" Veut gagner : petites ; perdre : garde","队友要啥给啥，对手缺啥卡啥":" Donne au partenaire, bloque l'adversaire","头游不争，双游才赢":" Ne dispute pas, vise le double","清小单、留炸弹、配好逢人配":" Vide petites, garde bombes, joker","队友顺就送，对手顺就压":" Sers le partenaire, bride l'adversaire","记王记A记断张，双游才是真赢":" Jokers, A, cassures : double = vrai gain","残局沉住气，枪不打四":" Calme en fin de partie, ne bombe pas 4","小顺往前凑，大顺必殿后":" Petite suite avant, grande après","强牌弱打，弱牌强打":" Fort joué faible, faible joué fort","轻易不打三带二，要打就要能打光":" Rarement trio+paire sauf pour vider","对手剩五张，坚决要开枪":" Adversaire à 5 cartes, bombe !","对手剩八张，暂且不用慌":" Adversaire à 8 cartes, pas panique","顺子打到头，对手没想头":" Suite jusqu'au bout, clash","两个小单张，不打不健康":" Deux petites, joue-les","敌人不要的，都是我们喜欢的":" Ce qu'ils rejettent nous plaît","掼蛋要配合，不挡对家路":" Équipe, ne bloque pas","对家要啥就给啥，拼尽全力也送上":" Donne au partenaire tout ce qu'il veut","自己能头游，留风给队友":" Si tu gagnes, laisse le vent","牌弱时宁肯牺牲自己也要支援对家":" Main faible, se sacrifie pour le partenaire","断张等于炸弹报警器":" Une casse = alerte bombe","自己缺啥，对手大概率有啥":" Ton manque = son avoir","炸头不炸尾，炸快不炸慢":" Bombe la tête pas la queue","下家剩两张，拆小对降单":" Voisin à 2, splitte une paire","小炸早用抢权，大炸晚出定局":" Petite bombe tôt, grosse tard","接风一定要记：队友走完，对家先出":" Suit le vent : partenaire puis partenaire","心要细，牌要整；攻要狠，守要稳":" Esprit vif, main nette ; attaque, défense","善配合，应变灵；巧用弹，炸得准":" Bon combo, bombe juste","牌型组合虽理好，随机应变也必要":" Bien formé, mais adapte-toi","死抱牌型一直等，等到最后未必成":" Trop attendre une forme","该出手时要出手，能打能收最理想":" Frappe au bon moment","掼蛋打得好，经商有头脑":" Bien jouer = bon marchand","掼蛋打得精，算账思路清":" Jouer fin = compter juste","掼蛋不怕炸，艺高人胆大":" Peur aucune, skill avant tout","赢了不吱声，说明城府深":" Gagner sans fanfare = profond","输了不投降，竞争能力强":" Perd sans abandon","掼蛋算得细，说明懂经济":" Bien compter = économie","枪不打四，你还真打":" Pas de bombe 4, tu l'as fait","逢人配都不懂用，可惜了":" Ne sait pas utiliser le joker","这波叫“撂荒”，牌拆稀碎":" On appelle ça gâcher","经典“抬轿”，坑队友没商量":" Porte son partenaire, piège","学会“板等”没？就等你上钩":" Connais « attendre » ? Je t'attends","一炸解千愁，全场安静":" Une bombe, table silencieuse","偷鸡不成蚀把米":" Perte sèche","这叫“放水”，故意放你一马":" On appelle ça ralentir","半路“截胡”，气死对手":" Couper en route, rage de l'adversaire","钢板一出，坚不可摧":" Plaque posée, invincible","钓鱼执法，小牌勾引":" Pêche avec petites cartes","头游冲刺，溜之大吉":" Sprint final, disparais","二游卡位，死守不退":" Deuxième s'accroche","赢牌“嘚瑟”，气死对手":" Gagner avec fanfare","出错就“圆牌”，强行解释":" Excuse ses erreurs","死攥大王，最后“憋王”翻盘":" Garde le Joker, retourne","出错就“甩锅”，对家背锅":" Rejette la faute sur le partenaire","天王炸镇场，谁敢嚣张":" Bombe Joker domine","这手牌“两头晃”，机动性拉满":" Main très mobile","借风一波，对家接风起飞":" Profite du vent, le partenaire décolle","抗贡成功，双王护体":" Exempté, deux Jokers","双下惨案，两人垫底":" Double dernier, drame","听牌了？余一手出不去咯":" Plus qu'une carte, bloqué ?","高单压你没商量":" Grosse carte t'écrase","跳张压制，级差拉满":" Saute des rangs, écart max","掼蛋用两副扑克牌共108张，四人两两对家配合。":" 108 cartes, 4 joueurs en équipe.","红桃的当前级数牌是逢人配，可以替任意牌凑牌型。":" Le Cœur du rang est le joker.","牌型从大到小依次是：天王炸、炸弹、同花顺、钢板、三连对、顺子、三带二、三张、对子、单张。":" Du plus grand: bombe Joker, bombe, quinte flush, plaque, paires, suite, trio+paire, trio, paire, simple.","顺子必须是5张点数连续、花色各不相同的单牌。":" Suite = 5 cartes consécutives, toutes suites.","三连对是3个点数连续的对子，一共6张。":" 3 paires consécutives, 6 cartes.","钢板是2个点数连续的三张，一共6张。":" Plaque = 2 trios consécutifs, 6 cartes.","同花顺是5张同花色、点数连续的牌，比五张及以下的炸弹还大。":" Quinte flush = 5 mêmes couleurs, > bombe 5.","炸弹张数越多越大；张数相同则比最大点数。":" Plus de cartes = plus grosse ; sinon rang.","天王炸由四张王组成，是最大牌型，谁有谁赢。":" Bombe des Jokers = 4 Jokers, le plus fort.","六张及以上的炸弹比同花顺大，五张炸弹比同花顺小。":" Bombe 6+ > quinte flush, 5 < quinte flush.","级牌从2一直打到A，先打过A的一方获胜。":" Du rang 2 à A, premier à A gagne.","头游是第一个出完牌的，末游是最后一个出完的。":" 1er finit premier, dernier finit dernier.","下游要向头游进贡自己最大的一张牌。":" Le dernier tribute sa plus grosse.","手握双大王可以抗贡，不用进贡。":" Deux Gros Jokers = exempté.","双下就是我方两人均末游，要进两张贡。":" Double dernier = deux tributs.","还贡时头游要把一张牌还给下游。":" Au retour, le 1er redonne une carte.","一圈没人要，最后出牌的人获得下一轮出牌权。":" Tour passé, dernier à jouer reprend.","接风是指上家出完最后一手牌，对家获得出牌权。":" Suivre le vent : le partenaire prend la main.","出牌要跟同牌型且更大的牌，或者出炸弹压过。":" Suis avec même type plus fort, ou bombe.","三带二是一个三张加一个对子组成。":" Trio+Paire = trio + paire.","掼蛋讲究配合，尽量不挡对家的路。":" L'équipe avant tout, ne bloque pas.","残局要留好炸弹、控住大单，才能稳稳赢。":" En fin, garde bombes et contrôle les gros.","记牌是高手的基本功，重点记王、级牌、2、A和断张。":" Mémorise Jokers, rang, 2, A, cassures.","逢人配优先去配顺子、连对、钢板，别轻易当单牌出。":" Joker d'abord suite/paire/plaque.","对手剩五张时，要坚决开枪用炸弹压制。":" Adversaire à 5, bombe sans hésiter.","按 Ctrl 加鼠标滚轮，可以缩放整个牌桌界面的大小。":" Ctrl + molette pour zoomer toute la table.","按 Ctrl 加鼠标滚轮，就能放大或缩小界面，看得更舒服。":" Ctrl + molette pour zoomer, plus confortable.","按 Ctrl 加鼠标滚轮缩放界面，是这软件特别好用的功能。":" Le zoom Ctrl + molette est très pratique.","按 Ctrl 加鼠标滚轮，界面大小随你调，远近都清楚。":" Ctrl + molette pour redimensionner l'interface à volonté.","桌面上的牌可以自由拖动，想放哪儿就拖到哪儿。":" Cartes libres, glisse où tu veux.","牌能自由拖动位置，理牌按你自己的习惯来。":" Cartes déplaçables, range à ta guise.","自由拖动牌的位置，是这个软件的一大亮点。":" Glisser librement est un point fort.","拖动牌的位置后，布局会按你的习惯保持。":" Après déplacement, disposition gardée.","有三种理牌方式：分类摆放、顺序阵列、紧凑顺序。":" 3 modes: groupe, rang, compact.","随便来一把模式不存档，顶栏会显示你开过和打完的局数。":" Partie rapide : pas de sauvegarde, compteur en haut.","无限随机刷榜模式会自动存档，可暂停退出后再继续。":" Infini : sauvegarde auto, pause possible.","天梯晋级大战一共五关，从没难度到难爆了，打过A就通关。":" Ligues : 5 niveaux, de Trivial à Brutal, passe A.","在难度设定里可以查看每个AI难度选项的说明。":" Dans les réglages, voir chaque option.","进贡和还贡时，桌面中下部会一直提示你，直到完成操作。":" Tribut/devolut : aide en bas.","轮到你出牌，桌面中下部会提示“你的回合，请出牌”。":" Ton tour : « À toi de jouer ».","出牌时四家会冒出气泡喊话，热闹又真实。":" Bulles de dialogue lors des coups, vivant.","右键或菜单可以暂停存档退出。":" Clic droit ou menu pour pause.","顺子、连对、钢板的长度都符合国家标准固定长度。":" Suite/paire/plaque : longueurs fixes.","牌面用黑体大字，大王红“大”、小王黑“小”，百搭牌有品红描边。":" Cartes en gras, Jokers marqués, joker bordé.","进天梯后每关都有独立的进度存档，进关自动继续。":" Ligues : chaque niveau sauvegardé.","小单先出，大单控场，这是掼蛋的基本功。":" Petites d'abord, c'est la base.","情况不明的时候，先出对子探探路。":" Si flou, paire pour sonder.","有王打单，无王打夯，别把王浪费在小事上。":" Avec Jokers simples, sans forts, pas de gaspillage.","逢人配要配炸不配单，配单太亏了。":" Joker à la bombe pas au simple, trop cher.","炸五不炸四，炸七不炸八，炸弹要算准时机。":" Bombe 5 pas 4, 7 pas 8, timing.","想上游就先走小单，想下游就留单张。":" Pour gagner, petites d'abord.","队友要啥给啥，对手缺啥卡啥，配合最重要。":" Donne au partenaire, bloque l'adversaire, c'est l'équipe.","头游不争，双游才赢，别抢对家的风。":" Ne dispute pas, double = vrai gain.","清小单、留炸弹、配好逢人配，牌路才顺。":" Vide petites, garde bombes, joker, flux lisse.","队友顺就送，对手顺就压，灵活应变。":" Sers le partenaire, bride l'adversaire, adapte-toi.","记王记A记断张，双游才是真赢家。":" Jokers, A, cassures : double = vrai vainqueur.","残局要沉住气，枪不打四，别乱开枪。":" En fin, garde ton calme, pas de bombe 4.","小顺往前凑，大顺必殿后，顺子有讲究。":" Petite suite avant, grande après.","对手剩五张，坚决要开枪压住他。":" Adversaire à 5, bombe pour le bloquer.","小炸早用抢权，大炸晚出定局，炸弹分先后。":" Petite bombe tôt, grosse tard, ordre.","接风一定要记：队友走完，对家先出。":" Suit le vent : partenaire fini, partenaire sort.","心要细，牌要整；攻要狠，守要稳。":" Esprit vif, main nette ; attaque, défense.","该出手时就出手，能打能收最理想。":" Frappe au bon moment, idéal.","善配合，应变灵；巧用弹，炸得准。":" Bon combo, bombe juste.","牌型组合虽理好，随机应变也必要。":" Bien formé, mais adapte-toi.","残局手里攥着逢人配，比攥着炸弹还踏实。":" En fin de partie, le joker vaut plus qu'une bombe.","对手连出小对子，八成是在试探你的大牌。":" Paires petites à répétition = teste tes grosses.","自己缺哪门花色，对手多半攥着那门的断张。":" Ta couleur manquante = sa casse.","想走上游，先把对家当自己人，别各打各的。":" Pour gagner, traite le partenaire comme toi.","我这手牌，红桃逢人配正好能接上，心里美滋滋。":" Mon Cœur joker s'emboîte, je savoure.","对家你只管冲，后路我帮你看着。":" Partenaire, fonce, je couvre.","掼蛋这玩意儿，三分手气七分配合，急不得。":" 3 parts chance, 7 équipe.","刚那手钢板打得，我自己都想给自己鼓个掌。":" Cette plaque, je m'applaudis.","一手小顺子铺下去，对手直接傻眼。":" Une petite suite, adversaire médusé.","逢人配在手，天下我有，就怕它闲着。":" Joker en main, le monde est à moi.","对手剩两张了，我得把眼睛睁大点。":" Adversaire à 2 cartes, je guette.","你看我这配合，对家都说我懂他。":" Vois mon combo, partenaire dit que je le comprends.","别看你牌多，多出来的没准儿全是累赘。":" Ne jalouse pas tes cartes, le surplus est du poids mort.","气沉丹田，牌要整、心要细，这局稳了。":" Calme, cartes nettes, cette manche est à nous.","你说巧不巧，我刚想出顺子你就铺好了。":" Drôle, je pensais suite et tu l'as posée.","这把牌风不错，稳扎稳打，不贪不慌。":" Beau flux, prudent.","天王炸这种宝贝，得留到节骨眼上才亮。":" Garde la bombe Joker pour le clash.","咱俩这默契，对面看了都得摇头。":" Notre entente, adversaires seuls.","没难度":" Trivial","小意思":" Facile","有点难":" Moyen","好厉害":" Dur","难爆了":" Brutal","记忆大师":" Maître de la mémoire","记牌":" Mémoire","记住所有玩家打出的每一张牌，随时推算剩余牌":" Retient chaque carte jouée","近期记忆":" Mémoire récente","只记得最近若干轮的出牌":" Se rappelle les derniers tours","中期记忆":" Mémoire moyenne","记得约半数牌局的出牌":" Se rappelle la moitié des coups","过目不忘":" Photographique","记牌精准且能预判对手残局":" Mémoire précise, devine le final","鱼的记忆":" Mémoire de poisson","完全不记得任何出过的牌":" N'oublie aucune carte","活在当下":" Vis le moment","只看当前这一圈和自己的手牌":" Ne voit que le tour actuel","记性差":" Mauvaise mémoire","记牌能力弱，且容易浪出大牌":" Mémoire faible, gaspille les grosses","忘性大":" Oublieux","记性差且不太顾对家":" Mauvaise mémoire, ignore le partenaire","奋勇争先":" Batailleur","策略":" Stratégie","优先出有掌控力的牌抢出牌权":" Joue contrôlant d'abord","默契搭档":" Coéquipier","懂得照顾对家，被对手压住时帮忙抢回":" Soutient le partenaire sous pression","主动让贤":" Cède volontiers","自己牌较差时主动让对家获得上游":" Main faible, laisse le partenaire gagner","逼炸战术":" Provocatio","反复用小牌领出，逼迫左右两家早早动用炸弹":" Petites cartes répétées forcent les bombes","算无遗策":" Calculé","根据剩余牌概率，在对手将取胜时卡住其最终出牌":" Bloque le final adverse au bon moment","一生谨慎":" Toujours prudent","依据记忆综合推算，谨慎决定何时出炸弹、何时保留大牌":" Calcule et décide prudemment","顺子达人":" Pro des suites","善于把零散牌组成顺子甩出":" Assemble des suites","连对钢板大师":" Pro suites/paires","善于打出三连对、钢板等连型":" Joue paires/plaques","控场高手":" Maître du contrôle","保留大牌与炸弹用于关键控场":" Garde grosses cartes et bombes pour le contrôle","残局之王":" Roi du final","残局处理极佳，留溜牌、炸留绝杀":" Fin de partie excellente, bombe pour le coup de grâce","王牌守护":" Garde Joker","妥善保留大小王用于收官":" Garde Jokers pour la fin","随机应变":" Adaptable","灵活组合顺子与连对，不被固定牌型束缚":" Combine librement","惜炸如金":" Bombe comme or","非关键时刻绝不动用炸弹":" Jamais de bombe hors moment clé","对家优先":" Partenaire d'abord","一切以对家上游为先":" Partenaire d'abord","敌手克星":" Fléau des rivaux","擅长在对手将赢时精准封堵":" Bloque précis à point","沉着冷静":" Calme","情绪稳定，少出昏招":" Stable, peu d'erreurs","智谋领出":" Mène intelligent","领出讲究顺序，先探后攻":" Mène dans l'ordre","大对子专家":" Pro des grosses paires","善用大对子控场":" Grandes paires pour contrôler","小牌清道夫":" Balayeur de petites","优先清理最小散牌":" Vide les plus petites d'abord","算牌能手":" Compteur de cartes","善算剩余牌与断张":" Calcule reste et cassures","快手出牌":" Main rapide","出牌果断，敢抢权":" Decisif, ose prendre la main","稳扎稳打":" Prudent","步步为营，保留后手":" Avance prudente, garde une carte","强势压制":" Agressif","主动压制对手、抢占节奏":" Presse l'adversaire","读心术":" Lecture d'esprit","能解读对手与对家意图":" Lit intentions et partenaire","试探行家":" Expert en sondage","用中小对子/单张试探对手牌力":" Sonde avec petites paires/cartes","控牌大师":" Maître de la donne","控牌与用炸时机老到":" Contrôle et bombes expérimenté","心有灵犀":" À l'unisson","配合":" Coop","与对家默契极高":" Complice avec le partenaire","高接低送":" Haut pris, bas donné","用大牌抢权后接续对家小牌":" Grosse carte puis petites du partenaire","舍己为人":" Altruiste","宁可牺牲自己也要送对家":" Se sacrifie pour le partenaire","团队至上":" Équipe d'abord","始终把团队胜负放第一":" Équipe d'abord","信号专家":" Expert en signaux","用出牌给对家清晰信号":" Donne des signaux au partenaire","各自为战":" Chacun pour soi","不配合对家，甚至会压自己队友出的牌":" Ne coopère pas, voire contre son partenaire","赌气压牌":" Rancune","赌气也要压住对家":" Par dépit, bride le partenaire","盲从跟风":" Mouton","缺乏主见，易被带节奏":" Sans avis, se laisse mener","炸弹狂魔":" Bombe fou","动辄用炸弹，浪费火力":" Bombe à tout va, gâche","过早炸":" Bombe précoce","过早动用炸弹暴露实力":" Bombe tôt = force révélée","乱拆炸弹":" Démonte les bombes","为小利拆散炸弹":" Démonte une bombe pour peu","大炸晚出":" Bombe tardive","大炸弹留到关键局定胜负":" Garde la grosse bombe pour le décider","经济用炸":" Bombe économique","精打细算使用炸弹":" Bombe avec précision","反炸高手":" Anti-bombe pro","善于用炸弹反制对手":" Contre avec des bombes","手忙脚乱":" Panique","风格":" Style","偶尔慌乱：乱出牌或在该压时放过":" Parfois panique, passe quand il faut battre","残局慌神":" Panique en fin","残局容易出错":" Erreurs fréquentes en fin","大牌浪人":" Gros joueur dissipé","早早把大牌浪出去":" Gaspille les grosses tôt","急躁冒进":" Impulsif","冒进抢攻、不留后手":" Aggressif, pas de réserve","盲目封堵":" Blocage aveugle","时机不对也硬封堵":" Bloque même au mauvais moment","乱枪打鸟":" Tirs dans le vide","领出毫无章法":" Mène sans plan","囤牌怪":" Accapareur","不愿组合顺子连对":" Répugne à faire suites/paires","反应迟钝":" Lent","出牌拖沓、易漏算":" Lent, oublie des calculs","漏牌大王":" Oublieur","关键牌容易漏出":" Oublie les cartes clés","全能型":" Polyvalent","各项能力均衡在线":" Équilibré partout","新手":" Novice","初学掼蛋，漏洞百出":" Débutant, plein de trous","类":" : ","项":" options","第":" Niveau ","关（":" (","本场":" Ce match"," AI难度：共":" Difficulté IA : ","项（":" options (","<div><b>我方搭档（对家）</b>：":"<div><b>Partenaire (vis-à-vis)</b> : ","（无）":" (aucun)","<div><b>对手（左右家）</b>：":"<div><b>Adversaires (gauche/droite)</b> : ","关 · ":" · ","难度档位：<b>":" Palier : <b>","</b>（对应天梯第 ":" </b> (ligue n° "," 关）":" niv.)","%）｜通关 ":" %) | Terminés "," 局｜":" manches | ","已通关 ✓":" Terminé ✓","可挑战":" Disponible","未解锁（先通关上一关）":" Verrouillé (passe le précédent)","请先通关第":" Termine d'abord le niveau ","关":" er","关 通关！打过 A 获胜":" terminé ! A passé","关 失败…对方打过 A":" échoué… adversaire a passé A","（我方）":" (Nous)","（对方）":" (Eux)","<br>本场战绩：胜 ":"<br>Match : V "," 局，共打 ":" manches, au total "," 局":" manches"," 通关":" — Terminé","<br><b>历史最佳</b>：胜 ":"<br><b>Record</b> : V ","进入第":" Entre niveau ","通关全部！再来一次":" Tout terminé ! Rejoue","重试本关":" Réessayer","大":" GROS","小":" PETIT","已完牌":" FINI","随便来一把":" Partie rapide","无限随机刷榜":" Infini","天梯晋级大战":" Tournoi de ligue","局 · 打":" · Niveau ","我方 ":" Nous "," | 对方 ":" | Adversaire ","出你最大的牌":" Joue ta plus grosse","试着出张单牌":" Essaie une carte","来个对子试试":" Essaie une paire","出三张压一压":" Pose un trio","甩条顺子出去":" Balance une suite","手里有炸弹，留着关键时刻炸":" Bombe en main, garde pour plus tard","看准了再出":" Attends le bon moment","别太急":" Ne te précipite pas","先稳一手":" Joue tranquille","这把能赢":" Tu vas gagner","请先点选要出的牌":" Sélectionne d'abord","所选的牌不构成合法牌型":" Sélection invalide","大不过上家的 ":" Plus fort que le dessus : ","这一轮你先出，必须出牌":" Tu mènes, tu dois jouer","：不要":" : Passe"," 出 ":" joue "," 完牌！":" gagne !"," 接风出牌":" prend la main","你的回合，请出牌":" À toi de jouer","头游":" 1er","二游":" 2e","三游":" 3e","末游":" Dernier","我方":" Notre","对方":" Leur","级数 ":" rang ","（升 ":" (+"," 级）":" niv.)","下一局打 ":" Niveau suivant ","，由 ":", mené par "," 先出":"","本局我方获胜":" Nous gagnons la manche","本局对方获胜":" Ils gagnent la manche","我方打 A 过关，获胜！":" Nous avons passé A — victoire !","对方打 A 过关…":" Adversaire a passé A…","再来一局":" Rejouer"," 进贡 ":" tribute ","；还贡 ":" ; rend ","发牌中…":" Distribution…","你 抓到双大王·抗贡（免贡）":" Tu as les deux Gros Jokers · exempté"," 抓到双大王·抗贡（免贡）":" a les deux Gros Jokers · exempté"," 红桃级牌免贡":" (Cœur atout exempté)","还贡":" Retour","进贡":" Tribut","收到进贡，请选择一张牌还贡（已自动选中对方进贡的牌，可改选），再点“还贡”。":" Reçu un tribut, choisis une carte à rendre, puis « Retour ».","你是上局末游，请选择一张牌进贡（红桃级牌可免贡），再点“进贡”。":" Tu étais dernier, choisis une carte à tributer (Cœur exempté), puis « Tribut ».","随机抽牌：":" Tirage aléatoire : ","局开始，打":" commence — niveau "," 先出牌":" mène","曾开局 <b>":" Démarrées <b>","</b> 局　|　完成 <b>":" </b> manches | Terminées <b>","关 最佳：胜 <b>":" meilleur : V <b>","%）</b>　|　通关 <b>":" %) </b> | Terminés <b>"," 局</b>　|　":" manches</b> | ","关 最佳：<b>暂无</b>（目标：打过 A）":" meilleur : <b>aucun</b> (objectif : passer A)","胜率 <b>":" Taux de victoire <b>","</b>　|　过A <b>":" </b> | Passer A <b>","</b>　|　弃场 <b>":" </b> | Abandons <b>","返回关卡选择":" Retour niveaux","返回上级菜单":" Retour","（检测到存档，点击「无限随机刷榜」继续上次进度）":" (Sauvegarde détectée — cliquez « Infini » pour continuer)","（各关进度独立存档，进入对应关卡自动继续）":" (Chaque niveau sauvegardé séparément, reprise auto à l'entrée)","已载入存档，继续上次的无限随机刷榜":" Sauvegarde chargée, reprise Infini","确定要清空天梯通关进度、最佳战绩与所有关卡存档吗？":" Vider ligue, records et sauvegardes ?","天梯进度与所有关卡存档已重置":" Ligue et sauvegardes réinitialisées","确定要清空无限随机刷榜的战绩与存档吗？":" Vider Infini, records et sauvegardes ?","无限随机刷榜进度已重置":" Infini réinitialisé","确定要清空“随便来一把”的累计局数与战绩吗？":" Vider les stats « Partie rapide » ?","“随便来一把”统计已重置":" Stats « Partie rapide » réinitialisées","确定要重新开始整场比赛吗？":" Recommencer tout le match ?","请选择恰好一张牌":" Choisis exactement une carte","向 ":" Rendu "," 还贡 ":" rend ","进贡 ":" Tributé ","退出到主菜单":"","菜单 ▾":"","暂停存档退出":"","放弃本场重开":"","第1局 · 打2":"","我方 2 | 对方 2":"","重新开始":"","对家 ":"","队友":""," 余牌 ":"","对手":"","剩余":"","正宗老淮安古法单机掼蛋":"","版本号 v3.3.2　圆蘑菇Archtect随便捣鼓的":"","我 ":"","本人":"","理牌：":"","分类摆放":"","顺序阵列":"","顺序紧凑":"","出牌":"","不要":"","技能：查牌":"","技能：快进":"","正宗":"","老淮安古法":"","单机掼蛋":"","你（下方）与对家一队，左右两家是对手。":"","系统设定和重置":"","玩法说明":"","本局结束":"","下一局":"","比赛结束":"","返回主菜单":"","五关难度递增，打过 A 即过关。点击关卡开始挑战，通关后可重新挑战刷新最佳战绩。":"","更多关卡敬请期待":"","第1关":"","目标：打过 A（先打到 A 并获胜）即过关。":"","开始挑战":"","返回选关":"","五个难度档位：":"","没难度 / 小意思 / 有点难 / 好厉害 / 难爆了":"","，依次对应天梯第 1–5 关。档位越高，对手越强、我方搭档越弱。":" correspond aux niveaux 1–5 de la ligue. Plus le palier est haut, plus l'adversaire est fort et notre partenaire faible.","返回":"","重置天梯进度":"","重置无限随机刷榜进度":"","重置“随便来一把”统计":"","三带二（三张+一对）":"","、顺子、三连对、钢板、同花顺、炸弹、天王炸。级牌仅次于双王。双上升 3 级，一三名升 2 级，一四名升 1 级，先打 A 获胜的一方赢。":", suite, paires consécutives, plaque, quinte flush, bombe, bombe des Jokers. La carte de rang vient après les deux Jokers. Double monte 3 niveaux, 1er/3e 2, 1er/4e 1 ; le premier à faire A gagne.","紧凑顺序":"","：自动存档，记录胜率与“过 A”进度，可随时暂停存档退出、下次继续。":" : sauvegarde auto, taux de victoire et progression du « passer A », pause/sortie possibles à tout moment.","两副牌 108 张，每人 27 张。牌型：单张、对子、三张、三带二（三张+一对）、顺子、三连对、钢板、同花顺、炸弹、天王炸。级牌仅次于双王。双上升 3 级，一三名升 2 级，一四名升 1 级，先打 A 获胜的一方赢。":"Deux paquets, 108 cartes, 27 chacun. Types de combinaison : simple, paire, trio, trio+paire, suite, paires consécutives, plaque, quinte flush, bombe, bombe des jokers. La carte de niveau vient juste après les deux jokers. Les deux gagnants montent de 3 niveaux, 1er et 3e montent de 2, 1er et 4e montent de 1 ; le camp qui passe le As en premier gagne.","：当前级牌的红桃（红桃级牌）是百搭，可当任意花色数字的牌（大小王除外）。出牌时即可当作百搭组合，牌面带「百搭」红标。":" : le Cœur de niveau actuel (le Cœur de niveau) est un joker, pouvant remplacer toute carte de couleur/valeur (sauf les jokers). Pendant le jeu il forme des combinaisons joker ; la carte porte un marqueur rouge « JOKER ».","：第 1 局随机抽一张牌决定谁先出；第 2 局起由上一局末游先出。":" : à la manche 1, une carte aléatoire décide qui commence ; à partir de la manche 2, le dernier de la manche précédente commence.","：第 2 局起进贡/还贡，在正常打牌界面用临时「进贡/还贡」按钮完成——对方进贡的牌会直接进你手并选中，你点选一张牌再点「还贡」即可；你是末游时点选一张牌点「进贡」（红桃级牌免贡/免还）。抗贡：若进贡方抓到两张大王（双大王），可抗贡，本局免进贡与还贡。":" : à partir de la manche 2, le tribut/retour se fait via des boutons temporaires « Tribut » / « Retour » sur l'écran de jeu normal — la carte de tribut arrive directement dans votre main et est sélectionnée ; choisissez une carte puis cliquez « Retour ». Si vous êtes dernier, choisissez une carte et cliquez « Tribut » (le Cœur de niveau est exempté). Anti-tribut : si le camp tributaire détient les deux gros jokers, il peut refuser le tribut ce tour.","：三种摆放方式——分类摆放（按炸弹/同花顺/王/级牌/三张/对子/单牌分组，炸弹与对子之间留空格）/ 顺序阵列（列=点数；上 4 行固定花色：第1行红桃、第2行黑桃、第3行方片、第4行梅花，缺该花色则留空不替补；第 5 行起放花色重复的牌，按红桃-黑桃-方片-梅花顺序自上而下紧凑排列不留空格，第 5 行以下每列各自独立；行数最少 4 行、最多 8 行）/ 紧凑顺序（列=点数，行数=同一点数最多的张数；每列都从第 1 行起向下贴紧、不留空格，列内按红桃-黑桃-方片-梅花顺序，同花色两张依次相邻）。都能按住牌拖到空格换位。":" : trois dispositions — Groupe (bombes/quintes flush/jokers/cartes de niveau/trios/paires/simples groupés, espace entre bombes et paires) / Tableau par rang (colonne = rang ; 4 premières lignes à couleurs fixes : ligne 1 Cœur, ligne 2 Pique, ligne 3 Trèfle, ligne 4 Carreau, vide si couleur absente ; à partir de la ligne 5 les doublons se placent de haut en bas sans espace dans l'ordre Cœur-Pique-Trèfle-Carreau, lignes sous 5 indépendantes par colonne ; 4 à 8 lignes) / Compact (colonne = rang, lignes = nombre max d'un même rang ; chaque colonne serrée de la ligne 1 vers le bas sans espace, dans l'ordre Cœur-Pique-Trèfle-Carreau, même couleur adjacente). On peut maintenir une carte et la glisser vers une case vide pour l'échanger.","理牌模式会被记住：每局开始自动延续你上一次点击的模式；整个游戏第一次玩默认「紧凑顺序」。":"Le mode de rangement est mémorisé : chaque manche reprend le mode que vous avez utilisé la dernière fois ; au tout premier jeu, « Compact » est par défaut.","：显示三家本局已打出的牌。":" : affiche toutes les cartes jouées par les trois autres ce tour.","：你出完所有牌后会出现，点一下就能让剩下的 AI 以最快速度把本局打完。":" : apparaît après que vous avez fini vos cartes ; un clic fait jouer les IA restantes à toute vitesse.","出牌时大家会互相喊话。":"Les joueurs se chamaillent pendant le jeu.","：五关难度递增，打过 A 即过关；每关开局会提示本关难度与将启用的 AI 难度选项。":" : cinq niveaux de difficulté croissante ; passer A débloque le niveau ; chaque niveau démarre en montrant sa difficulté et les options d'IA qu'il active.","万能牌":"Carte joker","开局先手":"Main initiale","上贡":"Tribut","理牌":"Rangement","技能之查牌":"Compétence : Viser","技能之快进":"Compétence : Avance rapide","① 游戏人数与目标":"① Joueurs et objectif","四人对战，两两一组（你的对家是搭档）。两副扑克牌共 108 张，每人发 27 张。先把手里的牌全部打光的一方所在队伍获胜；过程中不断“升级”，先打过 A（级牌升到 A 并获胜）的一方最终胜出。":"Quatre joueurs en deux équipes de deux (votre partenaire est en face). Deux jeux font 108 cartes, 27 chacun. L’équipe qui vide la première ses mains gagne la donne ; on monte de niveau en continu, et le camp qui passe premier l’As (niveau A atteint et gagné) remporte la partie.","② 牌点与大小顺序":"② Ordre des rangs","单牌大小：3 ＜ 4 ＜ 5 ＜ 6 ＜ 7 ＜ 8 ＜ 9 ＜ 10 ＜ J ＜ Q ＜ K ＜ A ＜ 2 ＜ 小王 ＜ 大王。当前“级牌”（本局要打的点数）比 2 还大，仅小于大小王；红桃级牌是“百搭”，可代替任意牌（大小王除外）。":"Force d’une carte seule : 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10 < J < Q < K < A < 2 < petit joker < gros joker. La « carte de niveau » (la rangue à jouer ce tour) est au-dessus du 2, juste sous les jokers ; le cœur de ce niveau est la « carte joker », remplaçant toute carte sauf les jokers.","③ 牌型一览":"③ Types de combinaisons","单张：任意一张牌。":"Carte seule : n’importe quelle carte.","对子：两张点数相同的牌。":"Paire : deux cartes de même rang.","三张：三张点数相同的牌。":"Brelan : trois cartes de même rang.","三带二：三张同点 + 一对（如 888+KK）。":"Brelan + paire : un brelan plus une paire (ex. 888 + KK).","顺子：五张连续单牌（如 3-4-5-6-7），2 和王不能进顺子。":"Suite : cinq cartes consécutives (ex. 3-4-5-6-7) ; le 2 et les jokers en sont exclus.","三连对：三对连续对子（如 33-44-55）。":"Paires consécutives : trois paires suivies (ex. 33-44-55).","钢板：两组连续三张（如 333-444）。":"Plaque : deux brelans consécutifs (ex. 333-444).","同花顺：五张同花色且连续（如红桃 3-4-5-6-7）。":"Couleur suite : cinq cartes consécutives d’une même couleur (ex. cœur 3-4-5-6-7).","炸弹：四张及以上同点（如 4444）；张数越多越大，同张数比点数。":"Bombe : quatre cartes ou plus d’un même rang (ex. 4444) ; plus il y en a, plus c’est fort, à nombre égal on compare le rang.","天王炸：四张王（双大双小），最大，无可压制。":"Bombe des jokers : les quatre jokers (deux grands + deux petits), la plus forte, invincible.","④ 怎样压牌（大小比较）":"④ Comment battre un jeu","普通牌型：只能“同型、同张数”比大小，例如顺子只能压更小的顺子，三带二只能压更大的三带二。":"Types normaux : on compare seulement « même type, même nombre » — une suite ne bat qu’une suite plus petite, brelan+paire ne bat qu’un brelan+paire plus grand.","炸弹：可压任何非炸弹牌型；更大的炸弹压更小的（六张以上 ＞ 五张 ＞ 四张；同张数比点数）。":"Bombes : battent tout type non-bombe ; une bombe plus grosse en bat une plus petite (6+ cartes > 5 > 4 ; à nombre égal on compare le rang).","同花顺：可压普通牌型，强于五张炸弹，但弱于六张以上炸弹。":"Couleur suite : bat les types normaux, plus forte qu’une bombe de 5 mais plus faible qu’une bombe de 6+.","天王炸：最大，任何牌都压不过。":"Bombe des jokers : la plus forte, rien ne peut la battre.","轮到你时若压不过或不想出，可点“不要”过牌。":"À votre tour, si vous ne pouvez ou ne voulez pas battre, cliquez « Passer ».","⑤ 出牌与领出":"⑤ Meneur et suiveur","每局先手方（第 1 局随机，之后由上一局末游领出）可出任意合法牌型；其余三家按顺时针跟牌，必须出“同型同张数且更大”的牌，或选择“不要”。一圈所有人都“不要”后，由最后出牌者（或其搭档）重新领出。":"Le meneur d’ouverture (tour 1 au hasard, ensuite le dernier de la donne précédente) peut jouer tout type légal. Les trois autres suivent dans le sens horaire et doivent jouer « même type, même nombre, plus fort » ou choisir « Passer ». Quand tous passent, le dernier joueur (ou son partenaire) mène une nouvelle donne.","⑥ 升级与胜负":"⑥ Montée de niveau & victoire","每局结束按名次升级：头游+搭档（双上）升 3 级；头游与下游（一三 / 一四）升 2 级或 1 级。你所在队伍先打过 A（级牌升到 A 并获胜）即赢得整局。级牌随升级从 2 一路打到 A 循环变化。":"Chaque donne finit selon le classement : vainqueur + partenaire (double montée) +3 niveaux ; vainqueur avec un finisseur bas (1er & 3e / 1er & 4e) +2 ou +1. Le camp qui passe premier l’As (niveau A atteint et gagné) remporte la partie. La carte de niveau monte du 2 à l’As au fil de la progression.","⑦ 进贡与还贡":"⑦ Hommage & retour","第 2 局起，上一局末游需向头游进贡一张牌；你收到对方进贡的牌后，挑一张还回去（红桃级牌免进 / 免还）。若进贡方手握两张大王，可“抗贡”，本局免进贡。":"Dès la ronde 2, le dernier de la donne précédente doit offrir une carte au vainqueur ; après l’avoir reçue, vous en rendez une (le cœur de niveau est exempté). Si le côté qui offre a les deux gros jokers, il peut « refuser l’hommage » et sauter ce tour.","⑧ 技能（屏幕下方）":"⑧ Compétences (bas de l’écran)","技能：查牌——随时查看三家本局已打出的牌。":"Compétence : Voyeur — voir à tout moment les cartes jouées par les trois adversaires.","技能：快进——你出完所有牌后便会可用，点一下让剩下的 AI 以最快速度把本局打完。":"Compétence : Avance rapide — disponible dès que vous avez fini vos cartes ; un clic fait jouer la donne aux IA à toute vitesse.","⑨ 游戏模式":"⑨ Modes de jeu","无限随机刷榜：自动存档，记录胜率与“过 A”进度，可随时暂停存档退出、下次继续。":"Classement infini : sauvegarde auto, suit le taux de victoire et la progression « passer l’As » ; pause, sauvegarde et sortie à tout moment.","天梯晋级大战：五关难度递增，打过 A 即过关。":"Escalier de ligue : cinq niveaux de difficulté croissante ; passer l’As valide un niveau.","⑩ 理牌与摆牌":"⑩ Ranger sa main","出牌区下方有三种摆牌方式：分类摆放（炸弹/同花顺/王/级牌/三张/对子/单牌分组）、顺序阵列（按点数分列、固定花色行）、紧凑顺序（同点数贴紧排列）。都能按住一张牌拖到空格换位；你上次选的模式会被记住。":"Sous la zone de jeu, trois dispositions : Groupe (bombes/couleurs J/S/tris/paires/simples), Rangée par rang (colonnes par rang, lignes de couleur fixes) et Compact (même rang serré). On peut glisser une carte vers une case vide pour échanger ; le dernier mode choisi est mémorisé."}};
-var TITLE = {"zh":"正宗老淮安古法单机掼蛋","en":"GuanDan — Classic Solo","fr":"GuanDan — Solo classique"};
+var I18N = {"fr":{"黑桃":" Pique","红桃":" Cœur","梅花":" Trèfle","方片":" Carreau","我":" Toi","右家":" Droite","对家":" Partenaire","左家":" Gauche","大王":" Gros Joker","小王":" Petit Joker","王":" Joker","单张":" Simple","对子":" Paire","三张":" Trio","天王炸":" Bombe des Jokers","炸弹":" Bombe","三带二":" Trio+Paire","同花顺":" Quinte flush","顺子":" Suite","三连对":" Paires consécutives","钢板":" Plaque","看我的！":" Regarde ça !","走一张":" Une carte","小牌开路":" Petites cartes devant","这张稳了":" C'est sûr","来，接招":" Tiens, prends ça","先探探路":" Sonde d'abord","这张不亏":" Pas de perte","清小单，控大单":" Vide les petites, contrôle les grosses","炸弹！轰！":" BOMBE ! Boum !","看我的炸弹":" Voici ma bombe","轰他！":" Boum lui !","一炸解千愁":" Une bombe règle tout","都别动，我炸":" Ne bougez, je bombe","炸得你怀疑人生":" Bombé sans pitié","就这？":" C'est tout ?","这点牌还想赢？":" Tu crois gagner avec ça ?","你这是在送啊":" Tu me donnes tout","哈哈，笑死我了":" Haha, morte de rire","闭着眼都能赢你":" Je te battrais les yeux fermés","我猜你手里没好货":" Je parie que tu n'as rien","下把你也赢不了":" Tu perdras aussi","你这出牌看得我头皮发麻":" Ton jeu me donne la Chair de poule","你是在帮我拆牌吗":" Tu démontes ma main ?","这操作简直教科书反面教材":" Exemple de quoi ne pas faire","队友都救不了你":" Même ton partenaire ne peut te sauver","别炸了别炸了，留着过年啊":" Arrête de bomber, garde-les!","你这牌路比迷宫还绕":" Ton cheminement = labyrinthe","刚才那手谁教你这么打的":" Qui t'a appris ce coup","你这叫勇，不叫会打":" C'est du courage, pas du jeu","输得这么优雅也是本事":" Perdre avec grâce","你是在给我喂牌吗":" Tu me donnes des cartes ?","你这节奏，像极了等公交迟迟不来":" Ton rythme = bus qui n'arrive pas","我都不好意思炸你，给你留点面子":" J'ai honte de te bomber","你手里那两张，我闭眼都知道是啥":" Tes deux cartes, je les devine","打得好！":" Bien joué !","漂亮！":" Magnifique !","厉害啊":" Impressionnant","稳了稳了":" On a ça","大佬带飞":" Porté par le pro","好牌！":" Belles cartes !","就靠你了":" Compte sur toi","这水平没谁了":" Personne ne joue comme toi","跟着你有肉吃":" Suivre, c'est gagner","牛！":" Génial !","神配合！":" Super combo !","这波喂牌绝了":" Ce don était fatal","对家懂我":" Mon partenaire me comprend","太会送了，爱了":" Trop généreux, j'adore","配合天衣无缝":" Coordination parfaite","小单先出，大单控场":" Petites d'abord, grosses contrôlent","情况不明，对子先行":" Si flou, commence par une paire","有王打单，无王打夯":" Avec Jokers, simples ; sans, fort","逢人配，配炸不配单":" Le joker va à la bombe","炸五不炸四，炸七不炸八":" Bombe un 5 pas un 4, un 7 pas un 8","想上游小单走，想下游留单张":" Veut gagner : petites ; perdre : garde","队友要啥给啥，对手缺啥卡啥":" Donne au partenaire, bloque l'adversaire","头游不争，双游才赢":" Ne dispute pas, vise le double","清小单、留炸弹、配好逢人配":" Vide petites, garde bombes, joker","队友顺就送，对手顺就压":" Sers le partenaire, bride l'adversaire","记王记A记断张，双游才是真赢":" Jokers, A, cassures : double = vrai gain","残局沉住气，枪不打四":" Calme en fin de partie, ne bombe pas 4","小顺往前凑，大顺必殿后":" Petite suite avant, grande après","强牌弱打，弱牌强打":" Fort joué faible, faible joué fort","轻易不打三带二，要打就要能打光":" Rarement trio+paire sauf pour vider","对手剩五张，坚决要开枪":" Adversaire à 5 cartes, bombe !","对手剩八张，暂且不用慌":" Adversaire à 8 cartes, pas panique","顺子打到头，对手没想头":" Suite jusqu'au bout, clash","两个小单张，不打不健康":" Deux petites, joue-les","敌人不要的，都是我们喜欢的":" Ce qu'ils rejettent nous plaît","掼蛋要配合，不挡对家路":" Équipe, ne bloque pas","对家要啥就给啥，拼尽全力也送上":" Donne au partenaire tout ce qu'il veut","自己能头游，留风给队友":" Si tu gagnes, laisse le vent","牌弱时宁肯牺牲自己也要支援对家":" Main faible, se sacrifie pour le partenaire","断张等于炸弹报警器":" Une casse = alerte bombe","自己缺啥，对手大概率有啥":" Ton manque = son avoir","炸头不炸尾，炸快不炸慢":" Bombe la tête pas la queue","下家剩两张，拆小对降单":" Voisin à 2, splitte une paire","小炸早用抢权，大炸晚出定局":" Petite bombe tôt, grosse tard","接风一定要记：队友走完，对家先出":" Suit le vent : partenaire puis partenaire","心要细，牌要整；攻要狠，守要稳":" Esprit vif, main nette ; attaque, défense","善配合，应变灵；巧用弹，炸得准":" Bon combo, bombe juste","牌型组合虽理好，随机应变也必要":" Bien formé, mais adapte-toi","死抱牌型一直等，等到最后未必成":" Trop attendre une forme","该出手时要出手，能打能收最理想":" Frappe au bon moment","掼蛋打得好，经商有头脑":" Bien jouer = bon marchand","掼蛋打得精，算账思路清":" Jouer fin = compter juste","掼蛋不怕炸，艺高人胆大":" Peur aucune, skill avant tout","赢了不吱声，说明城府深":" Gagner sans fanfare = profond","输了不投降，竞争能力强":" Perd sans abandon","掼蛋算得细，说明懂经济":" Bien compter = économie","枪不打四，你还真打":" Pas de bombe 4, tu l'as fait","逢人配都不懂用，可惜了":" Ne sait pas utiliser le joker","这波叫“撂荒”，牌拆稀碎":" On appelle ça gâcher","经典“抬轿”，坑队友没商量":" Porte son partenaire, piège","学会“板等”没？就等你上钩":" Connais « attendre » ? Je t'attends","一炸解千愁，全场安静":" Une bombe, table silencieuse","偷鸡不成蚀把米":" Perte sèche","这叫“放水”，故意放你一马":" On appelle ça ralentir","半路“截胡”，气死对手":" Couper en route, rage de l'adversaire","钢板一出，坚不可摧":" Plaque posée, invincible","钓鱼执法，小牌勾引":" Pêche avec petites cartes","头游冲刺，溜之大吉":" Sprint final, disparais","二游卡位，死守不退":" Deuxième s'accroche","赢牌“嘚瑟”，气死对手":" Gagner avec fanfare","出错就“圆牌”，强行解释":" Excuse ses erreurs","死攥大王，最后“憋王”翻盘":" Garde le Joker, retourne","出错就“甩锅”，对家背锅":" Rejette la faute sur le partenaire","天王炸镇场，谁敢嚣张":" Bombe Joker domine","这手牌“两头晃”，机动性拉满":" Main très mobile","借风一波，对家接风起飞":" Profite du vent, le partenaire décolle","抗贡成功，双王护体":" Exempté, deux Jokers","双下惨案，两人垫底":" Double dernier, drame","听牌了？余一手出不去咯":" Plus qu'une carte, bloqué ?","高单压你没商量":" Grosse carte t'écrase","跳张压制，级差拉满":" Saute des rangs, écart max","掼蛋用两副扑克牌共108张，四人两两对家配合。":" 108 cartes, 4 joueurs en équipe.","红桃的当前级数牌是逢人配，可以替任意牌凑牌型。":" Le Cœur du rang est le joker.","牌型从大到小依次是：天王炸、炸弹、同花顺、钢板、三连对、顺子、三带二、三张、对子、单张。":" Du plus grand: bombe Joker, bombe, quinte flush, plaque, paires, suite, trio+paire, trio, paire, simple.","顺子必须是5张点数连续、花色各不相同的单牌。":" Suite = 5 cartes consécutives, toutes suites.","三连对是3个点数连续的对子，一共6张。":" 3 paires consécutives, 6 cartes.","钢板是2个点数连续的三张，一共6张。":" Plaque = 2 trios consécutifs, 6 cartes.","同花顺是5张同花色、点数连续的牌，比五张及以下的炸弹还大。":" Quinte flush = 5 mêmes couleurs, > bombe 5.","炸弹张数越多越大；张数相同则比最大点数。":" Plus de cartes = plus grosse ; sinon rang.","天王炸由四张王组成，是最大牌型，谁有谁赢。":" Bombe des Jokers = 4 Jokers, le plus fort.","六张及以上的炸弹比同花顺大，五张炸弹比同花顺小。":" Bombe 6+ > quinte flush, 5 < quinte flush.","级牌从2一直打到A，先打过A的一方获胜。":" Du rang 2 à A, premier à A gagne.","头游是第一个出完牌的，末游是最后一个出完的。":" 1er finit premier, dernier finit dernier.","下游要向头游进贡自己最大的一张牌。":" Le dernier tribute sa plus grosse.","手握双大王可以抗贡，不用进贡。":" Deux Gros Jokers = exempté.","双下就是我方两人均末游，要进两张贡。":" Double dernier = deux tributs.","还贡时头游要把一张牌还给下游。":" Au retour, le 1er redonne une carte.","一圈没人要，最后出牌的人获得下一轮出牌权。":" Tour passé, dernier à jouer reprend.","接风是指上家出完最后一手牌，对家获得出牌权。":" Suivre le vent : le partenaire prend la main.","出牌要跟同牌型且更大的牌，或者出炸弹压过。":" Suis avec même type plus fort, ou bombe.","三带二是一个三张加一个对子组成。":" Trio+Paire = trio + paire.","掼蛋讲究配合，尽量不挡对家的路。":" L'équipe avant tout, ne bloque pas.","残局要留好炸弹、控住大单，才能稳稳赢。":" En fin, garde bombes et contrôle les gros.","记牌是高手的基本功，重点记王、级牌、2、A和断张。":" Mémorise Jokers, rang, 2, A, cassures.","逢人配优先去配顺子、连对、钢板，别轻易当单牌出。":" Joker d'abord suite/paire/plaque.","对手剩五张时，要坚决开枪用炸弹压制。":" Adversaire à 5, bombe sans hésiter.","按 Ctrl 加鼠标滚轮，可以缩放整个牌桌界面的大小。":" Ctrl + molette pour zoomer toute la table.","按 Ctrl 加鼠标滚轮，就能放大或缩小界面，看得更舒服。":" Ctrl + molette pour zoomer, plus confortable.","按 Ctrl 加鼠标滚轮缩放界面，是这软件特别好用的功能。":" Le zoom Ctrl + molette est très pratique.","按 Ctrl 加鼠标滚轮，界面大小随你调，远近都清楚。":" Ctrl + molette pour redimensionner l'interface à volonté.","桌面上的牌可以自由拖动，想放哪儿就拖到哪儿。":" Cartes libres, glisse où tu veux.","牌能自由拖动位置，理牌按你自己的习惯来。":" Cartes déplaçables, range à ta guise.","自由拖动牌的位置，是这个软件的一大亮点。":" Glisser librement est un point fort.","拖动牌的位置后，布局会按你的习惯保持。":" Après déplacement, disposition gardée.","有三种理牌方式：分类摆放、顺序阵列、紧凑顺序。":" 3 modes: groupe, rang, compact.","随便来一把模式不存档，顶栏会显示你开过和打完的局数。":" Partie rapide : pas de sauvegarde, compteur en haut.","无限随机刷榜模式会自动存档，可暂停退出后再继续。":" Infini : sauvegarde auto, pause possible.","天梯晋级大战一共五关，从没难度到难爆了，打过A就通关。":" Ligues : 5 niveaux, de Trivial à Brutal, passe A.","在难度设定里可以查看每个AI难度选项的说明。":" Dans les réglages, voir chaque option.","进贡和还贡时，桌面中下部会一直提示你，直到完成操作。":" Tribut/devolut : aide en bas.","轮到你出牌，桌面中下部会提示“你的回合，请出牌”。":" Ton tour : « À toi de jouer ».","出牌时四家会冒出气泡喊话，热闹又真实。":" Bulles de dialogue lors des coups, vivant.","右键或菜单可以暂停存档退出。":" Clic droit ou menu pour pause.","顺子、连对、钢板的长度都符合国家标准固定长度。":" Suite/paire/plaque : longueurs fixes.","牌面用黑体大字，大王红“大”、小王黑“小”，百搭牌有品红描边。":" Cartes en gras, Jokers marqués, joker bordé.","进天梯后每关都有独立的进度存档，进关自动继续。":" Ligues : chaque niveau sauvegardé.","小单先出，大单控场，这是掼蛋的基本功。":" Petites d'abord, c'est la base.","情况不明的时候，先出对子探探路。":" Si flou, paire pour sonder.","有王打单，无王打夯，别把王浪费在小事上。":" Avec Jokers simples, sans forts, pas de gaspillage.","逢人配要配炸不配单，配单太亏了。":" Joker à la bombe pas au simple, trop cher.","炸五不炸四，炸七不炸八，炸弹要算准时机。":" Bombe 5 pas 4, 7 pas 8, timing.","想上游就先走小单，想下游就留单张。":" Pour gagner, petites d'abord.","队友要啥给啥，对手缺啥卡啥，配合最重要。":" Donne au partenaire, bloque l'adversaire, c'est l'équipe.","头游不争，双游才赢，别抢对家的风。":" Ne dispute pas, double = vrai gain.","清小单、留炸弹、配好逢人配，牌路才顺。":" Vide petites, garde bombes, joker, flux lisse.","队友顺就送，对手顺就压，灵活应变。":" Sers le partenaire, bride l'adversaire, adapte-toi.","记王记A记断张，双游才是真赢家。":" Jokers, A, cassures : double = vrai vainqueur.","残局要沉住气，枪不打四，别乱开枪。":" En fin, garde ton calme, pas de bombe 4.","小顺往前凑，大顺必殿后，顺子有讲究。":" Petite suite avant, grande après.","对手剩五张，坚决要开枪压住他。":" Adversaire à 5, bombe pour le bloquer.","小炸早用抢权，大炸晚出定局，炸弹分先后。":" Petite bombe tôt, grosse tard, ordre.","接风一定要记：队友走完，对家先出。":" Suit le vent : partenaire fini, partenaire sort.","心要细，牌要整；攻要狠，守要稳。":" Esprit vif, main nette ; attaque, défense.","该出手时就出手，能打能收最理想。":" Frappe au bon moment, idéal.","善配合，应变灵；巧用弹，炸得准。":" Bon combo, bombe juste.","牌型组合虽理好，随机应变也必要。":" Bien formé, mais adapte-toi.","残局手里攥着逢人配，比攥着炸弹还踏实。":" En fin de partie, le joker vaut plus qu'une bombe.","对手连出小对子，八成是在试探你的大牌。":" Paires petites à répétition = teste tes grosses.","自己缺哪门花色，对手多半攥着那门的断张。":" Ta couleur manquante = sa casse.","想走上游，先把对家当自己人，别各打各的。":" Pour gagner, traite le partenaire comme toi.","我这手牌，红桃逢人配正好能接上，心里美滋滋。":" Mon Cœur joker s'emboîte, je savoure.","对家你只管冲，后路我帮你看着。":" Partenaire, fonce, je couvre.","掼蛋这玩意儿，三分手气七分配合，急不得。":" 3 parts chance, 7 équipe.","刚那手钢板打得，我自己都想给自己鼓个掌。":" Cette plaque, je m'applaudis.","一手小顺子铺下去，对手直接傻眼。":" Une petite suite, adversaire médusé.","逢人配在手，天下我有，就怕它闲着。":" Joker en main, le monde est à moi.","对手剩两张了，我得把眼睛睁大点。":" Adversaire à 2 cartes, je guette.","你看我这配合，对家都说我懂他。":" Vois mon combo, partenaire dit que je le comprends.","别看你牌多，多出来的没准儿全是累赘。":" Ne jalouse pas tes cartes, le surplus est du poids mort.","气沉丹田，牌要整、心要细，这局稳了。":" Calme, cartes nettes, cette manche est à nous.","你说巧不巧，我刚想出顺子你就铺好了。":" Drôle, je pensais suite et tu l'as posée.","这把牌风不错，稳扎稳打，不贪不慌。":" Beau flux, prudent.","天王炸这种宝贝，得留到节骨眼上才亮。":" Garde la bombe Joker pour le clash.","咱俩这默契，对面看了都得摇头。":" Notre entente, adversaires seuls.","没难度":" Trivial","小意思":" Facile","有点难":" Moyen","好厉害":" Dur","难爆了":" Brutal","记忆大师":" Maître de la mémoire","记牌":" Mémoire","记住所有玩家打出的每一张牌，随时推算剩余牌":" Retient chaque carte jouée","近期记忆":" Mémoire récente","只记得最近若干轮的出牌":" Se rappelle les derniers tours","中期记忆":" Mémoire moyenne","记得约半数牌局的出牌":" Se rappelle la moitié des coups","过目不忘":" Photographique","记牌精准且能预判对手残局":" Mémoire précise, devine le final","鱼的记忆":" Mémoire de poisson","完全不记得任何出过的牌":" N'oublie aucune carte","活在当下":" Vis le moment","只看当前这一圈和自己的手牌":" Ne voit que le tour actuel","记性差":" Mauvaise mémoire","记牌能力弱，且容易浪出大牌":" Mémoire faible, gaspille les grosses","忘性大":" Oublieux","记性差且不太顾对家":" Mauvaise mémoire, ignore le partenaire","奋勇争先":" Batailleur","策略":" Stratégie","优先出有掌控力的牌抢出牌权":" Joue contrôlant d'abord","默契搭档":" Coéquipier","懂得照顾对家，被对手压住时帮忙抢回":" Soutient le partenaire sous pression","主动让贤":" Cède volontiers","自己牌较差时主动让对家获得上游":" Main faible, laisse le partenaire gagner","逼炸战术":" Provocatio","反复用小牌领出，逼迫左右两家早早动用炸弹":" Petites cartes répétées forcent les bombes","算无遗策":" Calculé","根据剩余牌概率，在对手将取胜时卡住其最终出牌":" Bloque le final adverse au bon moment","一生谨慎":" Toujours prudent","依据记忆综合推算，谨慎决定何时出炸弹、何时保留大牌":" Calcule et décide prudemment","顺子达人":" Pro des suites","善于把零散牌组成顺子甩出":" Assemble des suites","连对钢板大师":" Pro suites/paires","善于打出三连对、钢板等连型":" Joue paires/plaques","控场高手":" Maître du contrôle","保留大牌与炸弹用于关键控场":" Garde grosses cartes et bombes pour le contrôle","残局之王":" Roi du final","残局处理极佳，留溜牌、炸留绝杀":" Fin de partie excellente, bombe pour le coup de grâce","王牌守护":" Garde Joker","妥善保留大小王用于收官":" Garde Jokers pour la fin","随机应变":" Adaptable","灵活组合顺子与连对，不被固定牌型束缚":" Combine librement","惜炸如金":" Bombe comme or","非关键时刻绝不动用炸弹":" Jamais de bombe hors moment clé","对家优先":" Partenaire d'abord","一切以对家上游为先":" Partenaire d'abord","敌手克星":" Fléau des rivaux","擅长在对手将赢时精准封堵":" Bloque précis à point","沉着冷静":" Calme","情绪稳定，少出昏招":" Stable, peu d'erreurs","智谋领出":" Mène intelligent","领出讲究顺序，先探后攻":" Mène dans l'ordre","大对子专家":" Pro des grosses paires","善用大对子控场":" Grandes paires pour contrôler","小牌清道夫":" Balayeur de petites","优先清理最小散牌":" Vide les plus petites d'abord","算牌能手":" Compteur de cartes","善算剩余牌与断张":" Calcule reste et cassures","快手出牌":" Main rapide","出牌果断，敢抢权":" Decisif, ose prendre la main","稳扎稳打":" Prudent","步步为营，保留后手":" Avance prudente, garde une carte","强势压制":" Agressif","主动压制对手、抢占节奏":" Presse l'adversaire","读心术":" Lecture d'esprit","能解读对手与对家意图":" Lit intentions et partenaire","试探行家":" Expert en sondage","用中小对子/单张试探对手牌力":" Sonde avec petites paires/cartes","控牌大师":" Maître de la donne","控牌与用炸时机老到":" Contrôle et bombes expérimenté","心有灵犀":" À l'unisson","配合":" Coop","与对家默契极高":" Complice avec le partenaire","高接低送":" Haut pris, bas donné","用大牌抢权后接续对家小牌":" Grosse carte puis petites du partenaire","舍己为人":" Altruiste","宁可牺牲自己也要送对家":" Se sacrifie pour le partenaire","团队至上":" Équipe d'abord","始终把团队胜负放第一":" Équipe d'abord","信号专家":" Expert en signaux","用出牌给对家清晰信号":" Donne des signaux au partenaire","各自为战":" Chacun pour soi","不配合对家，甚至会压自己队友出的牌":" Ne coopère pas, voire contre son partenaire","赌气压牌":" Rancune","赌气也要压住对家":" Par dépit, bride le partenaire","盲从跟风":" Mouton","缺乏主见，易被带节奏":" Sans avis, se laisse mener","炸弹狂魔":" Bombe fou","动辄用炸弹，浪费火力":" Bombe à tout va, gâche","过早炸":" Bombe précoce","过早动用炸弹暴露实力":" Bombe tôt = force révélée","乱拆炸弹":" Démonte les bombes","为小利拆散炸弹":" Démonte une bombe pour peu","大炸晚出":" Bombe tardive","大炸弹留到关键局定胜负":" Garde la grosse bombe pour le décider","经济用炸":" Bombe économique","精打细算使用炸弹":" Bombe avec précision","反炸高手":" Anti-bombe pro","善于用炸弹反制对手":" Contre avec des bombes","手忙脚乱":" Panique","风格":" Style","偶尔慌乱：乱出牌或在该压时放过":" Parfois panique, passe quand il faut battre","残局慌神":" Panique en fin","残局容易出错":" Erreurs fréquentes en fin","大牌浪人":" Gros joueur dissipé","早早把大牌浪出去":" Gaspille les grosses tôt","急躁冒进":" Impulsif","冒进抢攻、不留后手":" Aggressif, pas de réserve","盲目封堵":" Blocage aveugle","时机不对也硬封堵":" Bloque même au mauvais moment","乱枪打鸟":" Tirs dans le vide","领出毫无章法":" Mène sans plan","囤牌怪":" Accapareur","不愿组合顺子连对":" Répugne à faire suites/paires","反应迟钝":" Lent","出牌拖沓、易漏算":" Lent, oublie des calculs","漏牌大王":" Oublieur","关键牌容易漏出":" Oublie les cartes clés","全能型":" Polyvalent","各项能力均衡在线":" Équilibré partout","新手":" Novice","初学掼蛋，漏洞百出":" Débutant, plein de trous","类":" : ","项":" options","第":" Niveau ","关（":" (","本场":" Ce match"," AI难度：共":" Difficulté IA : ","项（":" options (","<div><b>我方搭档（对家）</b>：":"<div><b>Partenaire (vis-à-vis)</b> : ","（无）":" (aucun)","<div><b>对手（左右家）</b>：":"<div><b>Adversaires (gauche/droite)</b> : ","关 · ":" · ","难度档位：<b>":" Palier : <b>","</b>（对应天梯第 ":" </b> (ligue n° "," 关）":" niv.)","%）｜通关 ":" %) | Terminés "," 局｜":" manches | ","已通关 ✓":" Terminé ✓","可挑战":" Disponible","未解锁（先通关上一关）":" Verrouillé (passe le précédent)","请先通关第":" Termine d'abord le niveau ","关":" er","关 通关！打过 A 获胜":" terminé ! A passé","关 失败…对方打过 A":" échoué… adversaire a passé A","（我方）":" (Nous)","（对方）":" (Eux)","<br>本场战绩：胜 ":"<br>Match : V "," 局，共打 ":" manches, au total "," 局":" manches"," 通关":" — Terminé","<br><b>历史最佳</b>：胜 ":"<br><b>Record</b> : V ","进入第":" Entre niveau ","通关全部！再来一次":" Tout terminé ! Rejoue","重试本关":" Réessayer","大":" GROS","小":" PETIT","已完牌":" FINI","随便来一把":" Partie rapide","无限随机刷榜":" Infini","天梯晋级大战":" Tournoi de ligue","局 · 打":" · Niveau ","我方 ":" Nous "," | 对方 ":" | Adversaire ","出你最大的牌":" Joue ta plus grosse","试着出张单牌":" Essaie une carte","来个对子试试":" Essaie une paire","出三张压一压":" Pose un trio","甩条顺子出去":" Balance une suite","手里有炸弹，留着关键时刻炸":" Bombe en main, garde pour plus tard","看准了再出":" Attends le bon moment","别太急":" Ne te précipite pas","先稳一手":" Joue tranquille","这把能赢":" Tu vas gagner","请先点选要出的牌":" Sélectionne d'abord","所选的牌不构成合法牌型":" Sélection invalide","大不过上家的 ":" Plus fort que le dessus : ","这一轮你先出，必须出牌":" Tu mènes, tu dois jouer","：不要":" : Passe"," 出 ":" joue "," 完牌！":" gagne !"," 接风出牌":" prend la main","你的回合，请出牌":" À toi de jouer","头游":" 1er","二游":" 2e","三游":" 3e","末游":" Dernier","我方":" Notre","对方":" Leur","级数 ":" rang ","（升 ":" (+"," 级）":" niv.)","下一局打 ":" Niveau suivant ","，由 ":", mené par "," 先出":"","本局我方获胜":" Nous gagnons la manche","本局对方获胜":" Ils gagnent la manche","我方打 A 过关，获胜！":" Nous avons passé A — victoire !","对方打 A 过关…":" Adversaire a passé A…","再来一局":" Rejouer"," 进贡 ":" tribute ","；还贡 ":" ; rend ","发牌中…":" Distribution…","你 抓到双大王·抗贡（免贡）":" Tu as les deux Gros Jokers · exempté"," 抓到双大王·抗贡（免贡）":" a les deux Gros Jokers · exempté"," 红桃级牌免贡":" (Cœur atout exempté)","还贡":" Retour","进贡":" Tribut","收到进贡，请选择一张牌还贡（已自动选中对方进贡的牌，可改选），再点“还贡”。":" Reçu un tribut, choisis une carte à rendre, puis « Retour ».","你是上局末游，请选择一张牌进贡（红桃级牌可免贡），再点“进贡”。":" Tu étais dernier, choisis une carte à tributer (Cœur exempté), puis « Tribut ».","随机抽牌：":" Tirage aléatoire : ","局开始，打":" commence — niveau "," 先出牌":" mène","曾开局 <b>":" Démarrées <b>","</b> 局　|　完成 <b>":" </b> manches | Terminées <b>","关 最佳：胜 <b>":" meilleur : V <b>","%）</b>　|　通关 <b>":" %) </b> | Terminés <b>"," 局</b>　|　":" manches</b> | ","关 最佳：<b>暂无</b>（目标：打过 A）":" meilleur : <b>aucun</b> (objectif : passer A)","胜率 <b>":" Taux de victoire <b>","</b>　|　过A <b>":" </b> | Passer A <b>","</b>　|　弃场 <b>":" </b> | Abandons <b>","返回关卡选择":" Retour niveaux","返回上级菜单":" Retour","（检测到存档，点击「无限随机刷榜」继续上次进度）":" (Sauvegarde détectée — cliquez « Infini » pour continuer)","（各关进度独立存档，进入对应关卡自动继续）":" (Chaque niveau sauvegardé séparément, reprise auto à l'entrée)","已载入存档，继续上次的无限随机刷榜":" Sauvegarde chargée, reprise Infini","确定要清空天梯通关进度、最佳战绩与所有关卡存档吗？":" Vider ligue, records et sauvegardes ?","天梯进度与所有关卡存档已重置":" Ligue et sauvegardes réinitialisées","确定要清空无限随机刷榜的战绩与存档吗？":" Vider Infini, records et sauvegardes ?","无限随机刷榜进度已重置":" Infini réinitialisé","确定要清空“随便来一把”的累计局数与战绩吗？":" Vider les stats « Partie rapide » ?","“随便来一把”统计已重置":" Stats « Partie rapide » réinitialisées","确定要重新开始整场比赛吗？":" Recommencer tout le match ?","请选择恰好一张牌":" Choisis exactement une carte","向 ":" Rendu "," 还贡 ":" rend ","进贡 ":" Tributé ","存档并返回":"","存档并返回":"","暂停存档退出":"","放弃本场重开":"","第1局 · 打2":"","我方 2 | 对方 2":"","重新开始":"","对家 ":"","队友":""," 余牌 ":"","对手":"","剩余":"","正宗老淮安古法单机掼蛋":"","版本号 v3.3.2　圆蘑菇Archtect随便捣鼓的":"","我 ":"","本人":"","理牌：":"","分类摆放":"","顺序阵列":"","顺序紧凑":"","出牌":"","不要":"","技能：看已出牌":"","技能：快进":"","正宗":"","老淮安古法":"","单机掼蛋":"","你（下方）与对家一队，左右两家是对手。":"","系统设定和重置":"","玩法说明":"","本局结束":"","下一局":"","比赛结束":"","返回主菜单":"","五关难度递增，打过 A 即过关。点击关卡开始挑战，通关后可重新挑战刷新最佳战绩。":"","更多关卡敬请期待":"","第1关":"","目标：打过 A（先打到 A 并获胜）即过关。":"","开始挑战":"","返回选关":"","五个难度档位：":"","没难度 / 小意思 / 有点难 / 好厉害 / 难爆了":"","，依次对应天梯第 1–5 关。档位越高，对手越强、我方搭档越弱。":" correspond aux niveaux 1–5 de la ligue. Plus le palier est haut, plus l'adversaire est fort et notre partenaire faible.","返回":"","重置天梯进度":"","重置无限随机刷榜进度":"","重置“随便来一把”统计":"","三带二（三张+一对）":"","、顺子、三连对、钢板、同花顺、炸弹、天王炸。级牌仅次于双王。双上升 3 级，一三名升 2 级，一四名升 1 级，先打 A 获胜的一方赢。":", suite, paires consécutives, plaque, quinte flush, bombe, bombe des Jokers. La carte de rang vient après les deux Jokers. Double monte 3 niveaux, 1er/3e 2, 1er/4e 1 ; le premier à faire A gagne.","紧凑顺序":"","：自动存档，记录胜率与“过 A”进度，可随时暂停存档退出、下次继续。":" : sauvegarde auto, taux de victoire et progression du « passer A », pause/sortie possibles à tout moment.","两副牌 108 张，每人 27 张。牌型：单张、对子、三张、三带二（三张+一对）、顺子、三连对、钢板、同花顺、炸弹、天王炸。级牌仅次于双王。双上升 3 级，一三名升 2 级，一四名升 1 级，先打 A 获胜的一方赢。":"Deux paquets, 108 cartes, 27 chacun. Types de combinaison : simple, paire, trio, trio+paire, suite, paires consécutives, plaque, quinte flush, bombe, bombe des jokers. La carte de niveau vient juste après les deux jokers. Les deux gagnants montent de 3 niveaux, 1er et 3e montent de 2, 1er et 4e montent de 1 ; le camp qui passe le As en premier gagne.","：当前级牌的红桃（红桃级牌）是百搭，可当任意花色数字的牌（大小王除外）。出牌时即可当作百搭组合，牌面带「百搭」红标。":" : le Cœur de niveau actuel (le Cœur de niveau) est un joker, pouvant remplacer toute carte de couleur/valeur (sauf les jokers). Pendant le jeu il forme des combinaisons joker ; la carte porte un marqueur rouge « JOKER ».","：第 1 局随机抽一张牌决定谁先出；第 2 局起由上一局末游先出。":" : à la manche 1, une carte aléatoire décide qui commence ; à partir de la manche 2, le dernier de la manche précédente commence.","：第 2 局起进贡/还贡，在正常打牌界面用临时「进贡/还贡」按钮完成——对方进贡的牌会直接进你手并选中，你点选一张牌再点「还贡」即可；你是末游时点选一张牌点「进贡」（红桃级牌免贡/免还）。抗贡：若进贡方抓到两张大王（双大王），可抗贡，本局免进贡与还贡。":" : à partir de la manche 2, le tribut/retour se fait via des boutons temporaires « Tribut » / « Retour » sur l'écran de jeu normal — la carte de tribut arrive directement dans votre main et est sélectionnée ; choisissez une carte puis cliquez « Retour ». Si vous êtes dernier, choisissez une carte et cliquez « Tribut » (le Cœur de niveau est exempté). Anti-tribut : si le camp tributaire détient les deux gros jokers, il peut refuser le tribut ce tour.","：三种摆放方式——分类摆放（按炸弹/同花顺/王/级牌/三张/对子/单牌分组，炸弹与对子之间留空格）/ 顺序阵列（列=点数；上 4 行固定花色：第1行红桃、第2行黑桃、第3行方片、第4行梅花，缺该花色则留空不替补；第 5 行起放花色重复的牌，按红桃-黑桃-方片-梅花顺序自上而下紧凑排列不留空格，第 5 行以下每列各自独立；行数最少 4 行、最多 8 行）/ 紧凑顺序（列=点数，行数=同一点数最多的张数；每列都从第 1 行起向下贴紧、不留空格，列内按红桃-黑桃-方片-梅花顺序，同花色两张依次相邻）。都能按住牌拖到空格换位。":" : trois dispositions — Groupe (bombes/quintes flush/jokers/cartes de niveau/trios/paires/simples groupés, espace entre bombes et paires) / Tableau par rang (colonne = rang ; 4 premières lignes à couleurs fixes : ligne 1 Cœur, ligne 2 Pique, ligne 3 Trèfle, ligne 4 Carreau, vide si couleur absente ; à partir de la ligne 5 les doublons se placent de haut en bas sans espace dans l'ordre Cœur-Pique-Trèfle-Carreau, lignes sous 5 indépendantes par colonne ; 4 à 8 lignes) / Compact (colonne = rang, lignes = nombre max d'un même rang ; chaque colonne serrée de la ligne 1 vers le bas sans espace, dans l'ordre Cœur-Pique-Trèfle-Carreau, même couleur adjacente). On peut maintenir une carte et la glisser vers une case vide pour l'échanger.","理牌模式会被记住：每局开始自动延续你上一次点击的模式；整个游戏第一次玩默认「紧凑顺序」。":"Le mode de rangement est mémorisé : chaque manche reprend le mode que vous avez utilisé la dernière fois ; au tout premier jeu, « Compact » est par défaut.","：显示三家本局已打出的牌。":" : affiche toutes les cartes jouées par les trois autres ce tour.","：你出完所有牌后会出现，点一下就能让剩下的 AI 以最快速度把本局打完。":" : apparaît après que vous avez fini vos cartes ; un clic fait jouer les IA restantes à toute vitesse.","出牌时大家会互相喊话。":"Les joueurs se chamaillent pendant le jeu.","：五关难度递增，打过 A 即过关；每关开局会提示本关难度与将启用的 AI 难度选项。":" : cinq niveaux de difficulté croissante ; passer A débloque le niveau ; chaque niveau démarre en montrant sa difficulté et les options d'IA qu'il active.","万能牌":"Carte joker","开局先手":"Main initiale","上贡":"Tribut","理牌":"Rangement","技能之查牌":"Compétence : Viser","技能之快进":"Compétence : Avance rapide","① 游戏人数与目标":"① Joueurs et objectif","四人对战，两两一组（你的对家是搭档）。两副扑克牌共 108 张，每人发 27 张。先把手里的牌全部打光的一方所在队伍获胜；过程中不断“升级”，先打过 A（级牌升到 A 并获胜）的一方最终胜出。":"Quatre joueurs en deux équipes de deux (votre partenaire est en face). Deux jeux font 108 cartes, 27 chacun. L’équipe qui vide la première ses mains gagne la donne ; on monte de niveau en continu, et le camp qui passe premier l’As (niveau A atteint et gagné) remporte la partie.","② 牌点与大小顺序":"② Ordre des rangs","单牌大小：3 ＜ 4 ＜ 5 ＜ 6 ＜ 7 ＜ 8 ＜ 9 ＜ 10 ＜ J ＜ Q ＜ K ＜ A ＜ 2 ＜ 小王 ＜ 大王。当前“级牌”（本局要打的点数）比 2 还大，仅小于大小王；红桃级牌是“百搭”，可代替任意牌（大小王除外）。":"Force d’une carte seule : 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10 < J < Q < K < A < 2 < petit joker < gros joker. La « carte de niveau » (la rangue à jouer ce tour) est au-dessus du 2, juste sous les jokers ; le cœur de ce niveau est la « carte joker », remplaçant toute carte sauf les jokers.","③ 牌型一览":"③ Types de combinaisons","单张：任意一张牌。":"Carte seule : n’importe quelle carte.","对子：两张点数相同的牌。":"Paire : deux cartes de même rang.","三张：三张点数相同的牌。":"Brelan : trois cartes de même rang.","三带二：三张同点 + 一对（如 888+KK）。":"Brelan + paire : un brelan plus une paire (ex. 888 + KK).","顺子：五张连续单牌（如 3-4-5-6-7），2 和王不能进顺子。":"Suite : cinq cartes consécutives (ex. 3-4-5-6-7) ; le 2 et les jokers en sont exclus.","三连对：三对连续对子（如 33-44-55）。":"Paires consécutives : trois paires suivies (ex. 33-44-55).","钢板：两组连续三张（如 333-444）。":"Plaque : deux brelans consécutifs (ex. 333-444).","同花顺：五张同花色且连续（如红桃 3-4-5-6-7）。":"Couleur suite : cinq cartes consécutives d’une même couleur (ex. cœur 3-4-5-6-7).","炸弹：四张及以上同点（如 4444）；张数越多越大，同张数比点数。":"Bombe : quatre cartes ou plus d’un même rang (ex. 4444) ; plus il y en a, plus c’est fort, à nombre égal on compare le rang.","天王炸：四张王（双大双小），最大，无可压制。":"Bombe des jokers : les quatre jokers (deux grands + deux petits), la plus forte, invincible.","④ 怎样压牌（大小比较）":"④ Comment battre un jeu","普通牌型：只能“同型、同张数”比大小，例如顺子只能压更小的顺子，三带二只能压更大的三带二。":"Types normaux : on compare seulement « même type, même nombre » — une suite ne bat qu’une suite plus petite, brelan+paire ne bat qu’un brelan+paire plus grand.","炸弹：可压任何非炸弹牌型；更大的炸弹压更小的（六张以上 ＞ 五张 ＞ 四张；同张数比点数）。":"Bombes : battent tout type non-bombe ; une bombe plus grosse en bat une plus petite (6+ cartes > 5 > 4 ; à nombre égal on compare le rang).","同花顺：可压普通牌型，强于五张炸弹，但弱于六张以上炸弹。":"Couleur suite : bat les types normaux, plus forte qu’une bombe de 5 mais plus faible qu’une bombe de 6+.","天王炸：最大，任何牌都压不过。":"Bombe des jokers : la plus forte, rien ne peut la battre.","轮到你时若压不过或不想出，可点“不要”过牌。":"À votre tour, si vous ne pouvez ou ne voulez pas battre, cliquez « Passer ».","⑤ 出牌与领出":"⑤ Meneur et suiveur","每局先手方（第 1 局随机，之后由上一局末游领出）可出任意合法牌型；其余三家按顺时针跟牌，必须出“同型同张数且更大”的牌，或选择“不要”。一圈所有人都“不要”后，由最后出牌者（或其搭档）重新领出。":"Le meneur d’ouverture (tour 1 au hasard, ensuite le dernier de la donne précédente) peut jouer tout type légal. Les trois autres suivent dans le sens horaire et doivent jouer « même type, même nombre, plus fort » ou choisir « Passer ». Quand tous passent, le dernier joueur (ou son partenaire) mène une nouvelle donne.","⑥ 升级与胜负":"⑥ Montée de niveau & victoire","每局结束按名次升级：头游+搭档（双上）升 3 级；头游与下游（一三 / 一四）升 2 级或 1 级。你所在队伍先打过 A（级牌升到 A 并获胜）即赢得整局。级牌随升级从 2 一路打到 A 循环变化。":"Chaque donne finit selon le classement : vainqueur + partenaire (double montée) +3 niveaux ; vainqueur avec un finisseur bas (1er & 3e / 1er & 4e) +2 ou +1. Le camp qui passe premier l’As (niveau A atteint et gagné) remporte la partie. La carte de niveau monte du 2 à l’As au fil de la progression.","⑦ 进贡与还贡":"⑦ Hommage & retour","第 2 局起，上一局末游需向头游进贡一张牌；你收到对方进贡的牌后，挑一张还回去（红桃级牌免进 / 免还）。若进贡方手握两张大王，可“抗贡”，本局免进贡。":"Dès la ronde 2, le dernier de la donne précédente doit offrir une carte au vainqueur ; après l’avoir reçue, vous en rendez une (le cœur de niveau est exempté). Si le côté qui offre a les deux gros jokers, il peut « refuser l’hommage » et sauter ce tour.","⑧ 技能（屏幕下方）":"⑧ Compétences (bas de l’écran)","技能：看已出牌——随时查看三家本局已打出的牌。":"Compétence : Voyeur — voir à tout moment les cartes jouées par les trois adversaires.","技能：快进——你出完所有牌后便会可用，点一下让剩下的 AI 以最快速度把本局打完。":"Compétence : Avance rapide — disponible dès que vous avez fini vos cartes ; un clic fait jouer la donne aux IA à toute vitesse.","⑨ 游戏模式":"⑨ Modes de jeu","无限随机刷榜：自动存档，记录胜率与“过 A”进度，可随时暂停存档退出、下次继续。":"Classement infini : sauvegarde auto, suit le taux de victoire et la progression « passer l’As » ; pause, sauvegarde et sortie à tout moment.","天梯晋级大战：五关难度递增，打过 A 即过关。":"Escalier de ligue : cinq niveaux de difficulté croissante ; passer l’As valide un niveau.","⑩ 理牌与摆牌":"⑩ Ranger sa main","出牌区下方有三种摆牌方式：分类摆放（炸弹/同花顺/王/级牌/三张/对子/单牌分组）、顺序阵列（按点数分列、固定花色行）、紧凑顺序（同点数贴紧排列）。都能按住一张牌拖到空格换位；你上次选的模式会被记住。":"Sous la zone de jeu, trois dispositions : Groupe (bombes/couleurs J/S/tris/paires/simples), Rangée par rang (colonnes par rang, lignes de couleur fixes) et Compact (même rang serré). On peut glisser une carte vers une case vide pour échanger ; le dernier mode choisi est mémorisé."}};
+var TITLE = {"zh":"一个人的掼蛋","en":"One Man's GuanDan","fr":"GuanDan solitaire"};
 
 Object.assign(I18N.fr, {"规则":"Règles","技巧":"Techniques","高级":"Avancé","规则 1 · 单张":"Règle 1 · Carte seule","规则 2 · 对子":"Règle 2 · Paire","规则 3 · 三张":"Règle 3 · Brelan","规则 4 · 三带二":"Règle 4 · Brelan+Paire","规则 5 · 顺子":"Règle 5 · Suite","规则 6 · 连对":"Règle 6 · Paires consécutives","规则 7 · 同花顺":"Règle 7 · Quinte flush","规则 8 · 炸弹":"Règle 8 · Bombe","技巧教学 · 敬请期待":"Leçons techniques · à venir","高级技巧 · 敬请期待":"Techniques avancées · à venir","认识最简单的牌型：单张。":"La combinaison la plus simple : la carte seule.","两张点数相同、花色不同的牌组成对子。":"Une paire = deux cartes de même rang, de couleurs différentes.","三张点数相同的牌组成三张。":"Un brelan = trois cartes de même rang.","三带二 = 三张 + 一对（共五张）。":"Brelan+Paire = brelan + une paire (5 cartes).","顺子 = 五张点数连续、花色不限的单牌。":"Une suite = 5 cartes de rangs consécutifs (toutes couleurs).","连对 = 三对点数连续的对子（共六张）。":"Paires consécutives = trois paires de rangs consécutifs (6 cartes).","同花顺 = 五张同花色、点数连续的牌，比普通顺子更大。":"Quinte flush = 5 cartes de même couleur et rang consécutif, plus forte qu'une suite.","炸弹 = 四张或更多点数相同的牌，可压任何非炸弹牌型。":"Une bombe = 4 cartes ou plus de même rang, bat toute combinaison non-bombe.","欢迎来到新手教程！这是你的起手牌。点选任意一张牌，再点“出牌”，就能打出一张单张。":"Bienvenue ! Voici votre main. Touchez une carte, puis « Jouer » pour jouer une carte seule.","请只选一张牌，出单张。":"Choisissez une seule carte pour la carte seule.","对子要两张“点数相同”的牌。请选 S5 和 H5，一起点“出牌”。":"Une paire demande deux cartes de même rang. Sélectionnez S5 et H5 ensemble, puis « Jouer ».","请选两张点数相同的牌出对子。":"Choisissez deux cartes de même rang pour la paire.","三张要三张点数相同的牌。选 S5、H5、C5，一起出。":"Un brelan demande trois cartes de même rang. Sélectionnez S5, H5, C5 et jouez.","请选三张点数相同的牌出三张。":"Choisissez trois cartes de même rang pour le brelan.","三带二由“三张相同 + 一对”组成。选 S5、H5、C5 三张，再带 D9、S9 一对，共五张一起出。":"Brelan+Paire = trois mêmes + une paire. Sélectionnez S5,H5,C5 et la paire D9,S9 (5 cartes).","请选“三张相同 + 一对”共五张出三带二。":"Choisissez trois mêmes + une paire (5 cartes) pour le brelan+paire.","顺子是五张点数相连的单牌（如 3-4-5-6-7）。选 S3、H4、C5、D6、S7 一起出。":"Une suite = 5 cartes de rangs consécutifs (ex. 3-4-5-6-7). Sélectionnez S3,H4,C5,D6,S7.","请选五张点数连续、花色不同的单牌出顺子。":"Choisissez 5 cartes de rangs consécutifs, couleurs différentes, pour la suite.","连对是三对点数相连的对子（如 3-3、4-4、5-5）。选 S3、H3、S4、H4、S5、H5 一起出。":"Paires consécutives = trois paires de rangs consécutifs (ex. 3-3,4-4,5-5). Sélectionnez S3,H3,S4,H4,S5,H5.","请选三对点数连续的对子出连对。":"Choisissez trois paires de rangs consécutifs pour les paires consécutives.","同花顺是五张同花色且点数连续的牌（如全部黑桃 3-4-5-6-7）。选 S3、S4、S5、S6、S7 一起出。":"Quinte flush = 5 cartes même couleur et rang consécutif (ex. tous Piques 3-4-5-6-7). Sélectionnez S3,S4,S5,S6,S7.","请选五张同花色、点数连续的牌出同花顺。":"Choisissez 5 cartes même couleur et rang consécutif pour la quinte flush.","炸弹是四张或更多点数相同的牌。选 S5、H5、C5、D5 四张一起出。":"Une bombe = 4 cartes ou plus de même rang. Sélectionnez S5,H5,C5,D5 (quatre) et jouez.","请选四张或更多点数相同的牌出炸弹。":"Choisissez 4 cartes ou plus de même rang pour la bombe.","新手教程":"Tutoriel","跟着对门（你的搭档）一步步学掼蛋。先学规则，再练技巧。":"Apprenez le GuanDan pas à pas avec votre partenaire. Commencez par les règles, puis les techniques.","教程完成":"Tutoriel terminé","你已掌握本关要点，继续加油！":"Vous maîtrisez cette leçon, continuez !","下一关":"Leçon suivante","重玩本关":"Rejouer","返回主菜单":"Retour au menu","按对门说的做":"Faites comme votre partenaire","完成":"Terminé","再想想，跟对门说的不一样哦":"Rejouez, ce n'est pas ce que votre partenaire a dit","完成上一关后解锁":"Débloqué après avoir terminé le niveau précédent","敬请期待":"À venir"});
 
@@ -630,7 +633,7 @@ Object.assign(I18N.fr, {"规则":"Règles","技巧":"Techniques","高级":"Avanc
 /* 4.8.0：补齐菜单/按钮/系统对话框的法语翻译（剧情叙事文本按约定仍保持中文） */
 Object.assign(I18N.fr, {
 "正宗":"GuanDan","老淮安古法":"Classique","单机掼蛋":"Solo GuanDan",
-"保存并退出本章":"Enregistrer et quitter le chapitre",
+"存档并返回":"Enregistrer et quitter le chapitre",
 "教学要点":"Points clés","局面":"Situation","操作":"Action","原因":"Raison",
 "取消选牌":"Annuler la sélection",
 "剧情模式·一颗蛋的异世界之旅":"Mode Histoire · Le Voyage Interdimensionnel d'un Œuf",
@@ -653,9 +656,9 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
 <div id="topbar">
   <div id="statsRow"></div>
   <div id="topActions">
-    <button id="btnExitMenu" class="top-btn"><span class="i18n" data-zh="退出到主菜单" data-en="Exit to Menu">退出到主菜单</span></button>
-    <button id="btnMenu" class="top-btn"><span class="i18n" data-zh="菜单 ▾" data-en="Menu ▾">菜单 ▾</span></button>
-    <button id="btnStoryQuit" class="top-btn" style="display:none"><span class="i18n" data-zh="保存并退出本章" data-en="Save &amp; Exit Chapter">保存并退出本章</span></button>
+    <button id="btnExitMenu" class="top-btn"><span class="i18n" data-zh="存档并返回" data-en="Save &amp; Return">存档并返回</span></button>
+    <button id="btnMenu" class="top-btn"><span class="i18n" data-zh="存档并返回" data-en="Save &amp; Return">存档并返回</span></button>
+    <button id="btnStoryQuit" class="top-btn" style="display:none"><span class="i18n" data-zh="存档并返回" data-en="Save &amp; Return">存档并返回</span></button>
     <select id="selLang" class="top-btn sel-lang"></select>
   </div>
   <div id="menuPop" class="menu-pop">
@@ -698,7 +701,7 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
       <div id="deck2"></div>
       <div id="centerMsg"></div>
       <div id="centerMark"></div>
-      <div id="verMark"><span class="i18n" data-zh="RPG版 5.0预告版　圆蘑菇Archtect随便捣鼓的" data-en="RPG v5.0预告版　by RoundMushroom (Archtect)">RPG版 5.0预告版　圆蘑菇Archtect随便捣鼓的</span></div>
+      <div id="verMark"><span class="i18n" data-zh="RPG版 5.1.0预告版　圆蘑菇Archtect随便捣鼓的" data-en="RPG v5.1.0预告版　by RoundMushroom (Archtect)">RPG版 5.1.0预告版　圆蘑菇Archtect随便捣鼓的</span></div>
     </div>
     <div class="side-col">
       <div class="seat vseat" id="seat1">
@@ -733,10 +736,12 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
   <div class="actions">
     <button class="btn primary" id="btnPlay" data-primary-action disabled><span class="i18n" data-zh="出牌" data-en="Play">出牌</span></button>
     <button class="btn ghost" id="btnPass" disabled><span class="i18n" data-zh="不要" data-en="Pass">不要</span></button>
+    <button class="btn ghost" id="btnUndo" disabled><span class="i18n" data-zh="技能：悔牌" data-en="Skill: Undo">技能：悔牌</span></button>
     <button class="btn ghost" id="btnClearSel" disabled><span class="i18n" data-zh="取消选牌" data-en="Clear Selection">取消选牌</span></button>
     <button class="btn ghost" id="btnTribute" style="display:none"><span class="i18n" data-zh="进贡" data-en="Tribute">进贡</span></button>
-    <button class="btn ghost" id="btnHist"><span class="i18n" data-zh="技能：查牌" data-en="Skill: Peek">技能：查牌</span></button>
+    <button class="btn ghost" id="btnHist"><span class="i18n" data-zh="技能：看已出牌" data-en="Skill: Show Played">技能：看已出牌</span></button>
     <button class="btn ghost" id="btnFast" disabled title=""><span class="i18n" data-zh="技能：快进" data-en="Skill: Fast-Forward">技能：快进</span></button>
+    <button class="btn ghost" id="btnRedeal" disabled><span class="i18n" data-zh="技能：重新发牌" data-en="Skill: Re-deal">技能：重新发牌</span></button>
   </div>
 </main>
 
@@ -744,13 +749,13 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
 
 <div class="overlay show" id="startOverlay">
   <div class="panel" style="max-width:360px">
-    <h1 style="line-height:1.18"><span class="i18n" data-zh="正宗" data-en="GuanDan" data-fr="GuanDan">正宗</span><br><span style="color:#e23a3a"><span class="i18n" data-zh="老淮安古法" data-en="Classic Solo" data-fr="Classique">老淮安古法</span></span><br><span class="i18n" data-zh="单机掼蛋" data-en="Solo GuanDan" data-fr="Solo GuanDan">单机掼蛋</span></h1>
+    <h1 style="line-height:1.22; font-weight:900;"><span class="i18n" data-zh="一个人的掼蛋" data-en="One Man's GuanDan" data-fr="GuanDan solitaire">一个人的掼蛋</span><br><span style="color:#e23a3a; font-size:18px"><span class="i18n" data-zh="纯粹打牌的快乐" data-en="Pure Joy of the Game" data-fr="La joie pure du jeu">纯粹打牌的快乐</span></span></h1>
     <p style="text-align:center; margin:2px 0 12px"><span class="i18n" data-zh="你（下方）与对家一队，左右两家是对手。" data-en="You (bottom) team up with your Partner; Left and Right are your Opponents.">你（下方）与对家一队，左右两家是对手。</span></p>
     <div class="menu">
-      <button class="btn tut-lightgreen big-btn" id="btnTutorial"><span class="i18n" data-zh="新手教程" data-en="Tutorial">新手教程</span></button>
       <button class="btn primary big-btn" id="btnQuick"><span class="i18n" data-zh="随便来一把" data-en="Quick Play">随便来一把</span></button>
       <button class="btn primary big-btn" id="btnEndless"><span class="i18n" data-zh="无限随机刷榜" data-en="Endless Rank">无限随机刷榜</span></button>
       <button class="btn story-yellow big-btn" id="btnLadder"><span class="i18n" data-zh="天梯晋级大战" data-en="Ladder Tournament">天梯晋级大战</span></button>
+      <button class="btn tut-lightgreen big-btn" id="btnTutorial"><span class="i18n" data-zh="新手教程" data-en="Tutorial">新手教程</span></button>
       <button class="btn ghost big-btn" id="btnDifInfo"><span class="i18n" data-zh="系统设定和重置" data-en="Settings &amp; Reset">系统设定和重置</span></button>
       <button class="btn ghost big-btn" id="btnRules"><span class="i18n" data-zh="玩法说明" data-en="How to Play">玩法说明</span></button>
       <button class="btn story-yellow big-btn" id="btnStory"><span class="i18n" data-zh="剧情模式·一颗蛋的异世界之旅" data-en="Story Mode · An Egg's Otherworld Journey">剧情模式·一颗蛋的异世界之旅</span></button>
@@ -861,11 +866,11 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
 
 <div class="overlay" id="ladderOverlay">
   <div class="panel" style="max-width:430px">
+    <button class="btn ghost big-btn" id="btnLadderBack"><span class="i18n" data-zh="返回主菜单" data-en="Back to Menu">返回主菜单</span></button>
     <h1><span class="i18n" data-zh="天梯晋级大战" data-en="Ladder Tournament">天梯晋级大战</span></h1>
     <p style="text-align:center; margin:2px 0 8px"><span class="i18n" data-zh="十关难度递增，打过 A 即过关。点击关卡开始挑战，通关后可重新挑战刷新最佳战绩。" data-en="Ten levels of rising difficulty; pass A to clear. Tap a level to challenge; after clearing you can replay to improve your best record.">十关难度递增，打过 A 即过关。点击关卡开始挑战，通关后可重新挑战刷新最佳战绩。</span></p>
     <div id="ladderLevels" class="ladder-list"></div>
     <div id="ladderMore"><span class="i18n" data-zh="（共 10 关，逐关解锁，全部通关即登顶）" data-en="(10 levels total, unlock one by one; clear all to reach the top)">（共 10 关，逐关解锁，全部通关即登顶）</span></div>
-    <button class="btn ghost big-btn" id="btnLadderBack"><span class="i18n" data-zh="返回主菜单" data-en="Back to Menu">返回主菜单</span></button>
   </div>
 </div>
 
@@ -915,13 +920,14 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
       <button class="btn ghost big-btn" id="difInfoResetStory"><span class="i18n" data-zh="重置剧情模式进度" data-en="Reset Story Mode">重置剧情模式进度</span></button>
     </div>
     <button class="btn ghost big-btn" id="difInfoBack"><span class="i18n" data-zh="返回" data-en="Back">返回</span></button>
-    <p><span class="i18n" data-zh="五个难度档位：" data-en="Five difficulty tiers:">五个难度档位：</span><b><span class="i18n" data-zh="没难度 / 小意思 / 有点难 / 好厉害 / 难爆了" data-en="Trivial / Easy / Medium / Hard / Brutal">没难度 / 小意思 / 有点难 / 好厉害 / 难爆了</span></b><span class="i18n" data-zh="，依次对应天梯第 1–5 关。档位越高，对手越强、我方搭档越弱。" data-en=", matching Ladder levels 1–5. Higher tier means stronger opponents and weaker partner.">，依次对应天梯第 1–5 关。档位越高，对手越强、我方搭档越弱。</span></p>
     <div id="difInfoBody"></div>
   </div>
 </div>
 
 <div class="overlay" id="rulesOverlay">
   <div class="panel" style="max-width:470px; text-align:left">
+    <button class="btn ghost big-btn" id="rulesBack"><span class="i18n" data-zh="返回" data-en="Back">返回</span></button>
+    <div style="font-weight:800; color:#0c5e9e; margin:4px 0 10px; line-height:1.4"><span class="i18n" data-zh="商务合作请联系11925749@qq.com" data-en="Business: 11925749@qq.com">商务合作请联系11925749@qq.com</span></div>
     <h2><span class="i18n" data-zh="玩法说明" data-en="How to Play">玩法说明</span></h2>
     <div class="rules" id="rulesBox">
   <div class="rule-h"><span class="i18n" data-zh="① 游戏人数与目标" data-en="① Players &amp; Goal">① 游戏人数与目标</span></div>
@@ -952,7 +958,7 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
   <div class="rule-h"><span class="i18n" data-zh="⑦ 进贡与还贡" data-en="⑦ Tribute &amp; return">⑦ 进贡与还贡</span></div>
   <p><span class="i18n" data-zh="第 2 局起，上一局末游需向头游进贡一张牌；你收到对方进贡的牌后，挑一张还回去（红桃级牌免进 / 免还）。若进贡方手握两张大王，可“抗贡”，本局免进贡。" data-en="From round 2, the previous round’s last-place player must tribute one card to the winner; after receiving it, you pick a card to return (the Heart level card is exempt from tribute/return). If the tribute side holds both Big Jokers, they may &quot;refuse tribute&quot; and skip it this round.">第 2 局起，上一局末游需向头游进贡一张牌；你收到对方进贡的牌后，挑一张还回去（红桃级牌免进 / 免还）。若进贡方手握两张大王，可“抗贡”，本局免进贡。</span></p>
   <div class="rule-h"><span class="i18n" data-zh="⑧ 技能（屏幕下方）" data-en="⑧ Skills (bottom of screen)">⑧ 技能（屏幕下方）</span></div>
-  <div class="rule-li">◆ <span class="i18n" data-zh="技能：查牌——随时查看三家本局已打出的牌。" data-en="Skill: Peek — view the cards the three opponents have played this round, anytime.">技能：查牌——随时查看三家本局已打出的牌。</span></div>
+  <div class="rule-li">◆ <span class="i18n" data-zh="技能：看已出牌——随时查看三家本局已打出的牌。" data-en="Skill: Show Played — view the cards the three opponents have played this round, anytime.">技能：看已出牌——随时查看三家本局已打出的牌。</span></div>
   <div class="rule-li">◆ <span class="i18n" data-zh="技能：快进——你出完所有牌后便会可用，点一下让剩下的 AI 以最快速度把本局打完。" data-en="Skill: Fast-forward — becomes available once you finish your cards; one click makes the remaining AIs play the round at top speed.">技能：快进——你出完所有牌后便会可用，点一下让剩下的 AI 以最快速度把本局打完。</span></div>
   <div class="rule-h"><span class="i18n" data-zh="⑨ 游戏模式" data-en="⑨ Game modes">⑨ 游戏模式</span></div>
   <div class="rule-li">◆ <span class="i18n" data-zh="无限随机刷榜：自动存档，记录胜率与“过 A”进度，可随时暂停存档退出、下次继续。" data-en="Endless Rank: auto-saves, tracks win rate and &quot;pass A&quot; progress; pause, save and quit anytime, continue later.">无限随机刷榜：自动存档，记录胜率与“过 A”进度，可随时暂停存档退出、下次继续。</span></div>
@@ -960,7 +966,6 @@ var LANGS = [{"id":"zh","label":"中文"},{"id":"en","label":"English"},{"id":"f
   <div class="rule-h"><span class="i18n" data-zh="⑩ 理牌与摆牌" data-en="⑩ Arranging your hand">⑩ 理牌与摆牌</span></div>
   <p><span class="i18n" data-zh="出牌区下方有三种摆牌方式：分类摆放（炸弹/同花顺/王/级牌/三张/对子/单牌分组）、顺序阵列（按点数分列、固定花色行）、紧凑顺序（同点数贴紧排列）。都能按住一张牌拖到空格换位；你上次选的模式会被记住。" data-en="Below the play area there are three layouts: Group (bombs/straight-flushes/Jokers/rank/trios/pairs/singles), Array by Rank (columns by rank, fixed suit rows), and Compact (same rank packed tight). You can drag a card to an empty slot to swap; your last chosen mode is remembered.">出牌区下方有三种摆牌方式：分类摆放（炸弹/同花顺/王/级牌/三张/对子/单牌分组）、顺序阵列（按点数分列、固定花色行）、紧凑顺序（同点数贴紧排列）。都能按住一张牌拖到空格换位；你上次选的模式会被记住。</span></p>
   </div>
-    <button class="btn ghost big-btn" id="rulesBack"><span class="i18n" data-zh="返回" data-en="Back">返回</span></button>
   </div>
 </div>
 
@@ -1025,9 +1030,9 @@ function applyLang(){
   translateStatic();
   var vm = document.getElementById('verMark');
   if (vm){
-    if (LANG==='en') vm.textContent = 'RPG v5.0预告版 — RoundMushroom (Archtect)';
-    else if (LANG==='fr') vm.textContent = 'RPG v5.0预告版 — RoundMushroom (Archtect)';
-    else vm.textContent = 'RPG版 5.0预告版　圆蘑菇Archtect随便捣鼓的';
+    if (LANG==='en') vm.textContent = 'RPG v5.1.0预告版 — RoundMushroom (Archtect)';
+    else if (LANG==='fr') vm.textContent = 'RPG v5.1.0预告版 — RoundMushroom (Archtect)';
+    else vm.textContent = 'RPG版 5.1.0预告版　圆蘑菇Archtect随便捣鼓的';
   }
   var renderers = ['renderHeader','renderCounts','renderHandFromSlots','renderTurnUI','renderTableFromState','renderCenterMark','renderStats','renderIdleNow','updateFastButton','renderSaveHint','renderTutorialSelect'];
   for (var r=0;r<renderers.length;r++){ if (typeof window[renderers[r]]==='function'){ try { window[renderers[r]](); } catch(e){} } }
@@ -1048,7 +1053,7 @@ const SUIT_COLOR = {H:'#e23a3a', D:'#f28c28', S:'#151515', C:'#2563eb'};
 const SUIT_NAME  = {S:T("黑桃", "Spade"), H:T("红桃", "Heart"), C:T("梅花", "Club"), D:T("方片", "Diamond")};
 const RANK_NAME  = {11:'J', 12:'Q', 13:'K', 14:'A'};
 const NAMES = [T("我", "You"),T("右家", "Right"),T("对家", "Partner"),T("左家", "Left")];
-const ROWS = 4, COLS = 16; let GRID_COLS = 16, GRID_ROWS = ROWS;
+const ROWS = 4, COLS = 14; let GRID_COLS = 14, GRID_ROWS = ROWS;
 let uid = 0;
 
 function buildDeck(){
@@ -2008,19 +2013,65 @@ function speak(text){ /* AI 语音已移除，仅保留气泡喊话 */ }
 
 /* ================= 牌桌喊话（话语库随机） ================= */
 const CHAT = {
-  playSelf:[T("看我的！", "Watch this!"),T("走一张", "One card out"),T("小牌开路", "Small cards lead"),T("这张稳了", "This one is safe"),T("来，接招", "Here, take it"),T("先探探路", "Probing first"),T("这张不亏", "No loss here"),T("清小单，控大单", "Clear the smalls, control the bigs")],
-  playBomb:[T("炸弹！轰！", "BOMB! Boom!"),T("看我的炸弹", "Behold my bomb"),T("轰他！", "Blast him!"),T("炸！", "Bomb!"),T("一炸解千愁", "One bomb ends it all"),T("都别动，我炸", "Nobody move, I bomb"),T("炸得你怀疑人生", "Bombed you into next week")],
+  playSelf:[T("看我的！", "Watch this!"),T("走一张", "One card out"),T("小牌开路", "Small cards lead"),T("这张稳了", "This one is safe"),T("来，接招", "Here, take it"),T("先探探路", "Probing first"),T("这张不亏", "No loss here"),T("清小单，控大单", "Clear the smalls, control the bigs"),
+      T("这张我先手，压住节奏。","I lead with this, setting the pace."),
+      T("小牌先走，留大牌压场。","Small cards first, keep big to dominate."),
+      T("顺子铺出去，节奏就对了。","Lay the straight, the rhythm is right."),
+      T("看准了，这手不亏。","Spotted it, this play is safe."),
+      T("对家放心，我给你开路。","Partner relax, I clear your path."),
+      T("这把稳，先占个先手。","This one is steady, I take the lead."),
+      T("三带二，先把杂牌清了。","Trio+pair, clear the clutter first."),
+      T("连对甩出去，舒服。","Consecutive pairs out, feels good."),
+      T("炸弹先收着，时机未到。","Holding the bomb, timing not yet."),
+      T("我这张压你一头。","My card tops yours."),
+      T("钢板架起来，硬气。","Plate stacked, solid and strong."),
+      T("收尾一张，走你。","Last card, off you go.")],
+  playBomb:[T("炸弹！轰！", "BOMB! Boom!"),T("看我的炸弹", "Behold my bomb"),T("轰他！", "Blast him!"),T("炸！", "Bomb!"),T("一炸解千愁", "One bomb ends it all"),T("都别动，我炸", "Nobody move, I bomb"),T("炸得你怀疑人生", "Bombed you into next week"),
+      T("天王炸！全场静音。","Joker Bomb! Table goes silent."),
+      T("六张炸，谁顶得住？","Six-card bomb, who can stand it?"),
+      T("同花顺压你五张炸。","Straight flush over your five-bomb."),
+      T("炸完这波，对手傻眼。","After this bomb, opponents stunned."),
+      T("不留了，直接炸穿。","No holding back, blast through."),
+      T("这一炸，定下乾坤。","This bomb decides it all."),
+      T("小炸探路，大炸收官。","Small bomb probes, big bomb ends."),
+      T("炸得对手怀疑人生。","Bombed opponents into doubt."),
+      T("满手王炸，任性一回。","Full of joker bombs, indulge once."),
+      T("王炸镇楼，谁敢动？","Joker bomb guards, who dares move?")],
   trash:[
     T("就这？", "That all?"),T("这点牌还想赢？", "You really think that wins?"),T("你这是在送啊", "You are just feeding me"),T("哈哈，笑死我了", "Laughing my head off"),
     T("闭着眼都能赢你", "I could beat you blindfolded"),T("我猜你手里没好货", "I bet you got nothing good"),T("下把你也赢不了", "You will lose next round too"),T("你这出牌看得我头皮发麻", "Your play gives me a headache"),
     T("你是在帮我拆牌吗", "Are you taking apart my hand for me?"),T("这操作简直教科书反面教材", "Textbook example of how NOT to play"),T("队友都救不了你", "Even your partner cannot save you"),T("别炸了别炸了，留着过年啊", "Stop bombing, save it for New Year"),
     T("你这牌路比迷宫还绕", "Your card path is more tangled than a maze"),T("刚才那手谁教你这么打的", "Who taught you that last move"),T("你这叫勇，不叫会打", "That was brave, not smart"),T("输得这么优雅也是本事", "Losing so gracefully is a talent"),
-    T("你是在给我喂牌吗", "Are you feeding me cards on purpose"),T("你这节奏，像极了等公交迟迟不来", "Your tempo is like waiting for a bus that never comes"),T("我都不好意思炸你，给你留点面子", "I am almost embarrassed to bomb you, saving your pride"),T("你手里那两张，我闭眼都知道是啥", "I know exactly those two cards you are holding")
+    T("你是在给我喂牌吗", "Are you feeding me cards on purpose"),T("你这节奏，像极了等公交迟迟不来", "Your tempo is like waiting for a bus that never comes"),T("我都不好意思炸你，给你留点面子", "I am almost embarrassed to bomb you, saving your pride"),T("你手里那两张，我闭眼都知道是啥", "I know exactly those two cards you are holding"),
+      T("就这水平还来掼蛋？","This level and you play GuanDan?"),
+      T("你这牌路，像没头苍蝇。","Your play is like a headless fly."),
+      T("我都能背出你手里的牌了。","I could recite your hand by heart."),
+      T("别挣扎了，认输吧你。","Stop struggling, just concede."),
+      T("你这是在给我送温暖。","You are just warming me up."),
+      T("这操作，我家猫都比你强。","This play, my cat beats you."),
+      T("你出牌前是不是没带脑子。","Did you leave your brain before playing?"),
+      T("对手就这？我笑纳了。","Opponent like this? I'll gladly take it."),
+      T("你这配合，坑死对家。","Your teamwork buries your partner."),
+      T("再来十把你也赢不了。","Ten more rounds, still you lose."),
+      T("你手里那点货，我一览无余。","Your cards, fully exposed to me."),
+      T("别跟了，跟也是送。","Don't follow, following just feeds.")
   ],
   praise:[
     T("打得好！", "Nicely done!"),T("漂亮！", "Beautiful!"),T("厉害啊", "Impressive"),T("稳了稳了", "We got this"),T("大佬带飞", "Carried by the pro"),T("好牌！", "Good cards!"),
     T("就靠你了", "Counting on you"),T("这水平没谁了", "No one plays like you"),T("跟着你有肉吃", "Following you pays off"),T("牛！", "Awesome!"),T("神配合！", "Perfect teamwork!"),
-    T("这波喂牌绝了", "That feed was lethal"),T("对家懂我", "Partner gets me"),T("太会送了，爱了", "Love how you feed"),T("配合天衣无缝", "Flawless coordination")
+    T("这波喂牌绝了", "That feed was lethal"),T("对家懂我", "Partner gets me"),T("太会送了，爱了", "Love how you feed"),T("配合天衣无缝", "Flawless coordination"),
+      T("对家这手，绝了！","Partner, that move was brilliant!"),
+      T("就喜欢你这默契。","Love this chemistry of yours."),
+      T("跟着你打，心里踏实。","Playing with you, I'm at ease."),
+      T("这波配合，教科书级别。","This coordination, textbook level."),
+      T("对家牛，带我飞。","Partner's a beast, carry me."),
+      T("你出牌，我放心。","When you play, I trust."),
+      T("神级喂牌，爱了爱了。","God-tier feed, love it."),
+      T("这节奏，稳如老狗。","This pace, steady as a rock."),
+      T("对家懂我，不用多说。","Partner gets me, no words needed."),
+      T("漂亮，一锤定音！","Beautiful, sealed the deal!"),
+      T("你这手感，热得发烫。","Your touch is on fire."),
+      T("双剑合璧，天下无敌。","Two swords unite, unbeatable.")
   ],
   tips:[  // 经验 / 顺口溜 / 俗语（中立方均可说）
     T("小单先出，大单控场", "Lead small singles, control with big ones"),T("情况不明，对子先行", "When unsure, lead a pair first"),T("有王打单，无王打夯", "With Jokers play singles, without, play strong"),
@@ -2036,7 +2087,23 @@ const CHAT = {
     T("心要细，牌要整；攻要狠，守要稳", "Mind sharp, hand tidy; attack fierce, defend steady"),T("善配合，应变灵；巧用弹，炸得准", "Cooperate well, adapt nimbly; use bombs wisely, bomb accurately"),
     T("牌型组合虽理好，随机应变也必要", "Good shape helps, but adapt when needed"),T("死抱牌型一直等，等到最后未必成", "Clinging to a shape forever may not pay off in the end"),T("该出手时要出手，能打能收最理想", "Strike when you should, play and retract ideally"),
     T("掼蛋打得好，经商有头脑", "Play GuanDan well, you think like a merchant"),T("掼蛋打得精，算账思路清", "Play GuanDan sharp, you calculate like an accountant"),T("掼蛋不怕炸，艺高人胆大", "GuanDan fears no bomb, skill beats nerve"),
-    T("赢了不吱声，说明城府深", "Win without boasting, deep mind"),T("输了不投降，竞争能力强", "Lose without quitting, strong competitor"),T("掼蛋算得细，说明懂经济", "Count well in GuanDan, you understand economy")
+    T("赢了不吱声，说明城府深", "Win without boasting, deep mind"),T("输了不投降，竞争能力强", "Lose without quitting, strong competitor"),T("掼蛋算得细，说明懂经济", "Count well in GuanDan, you understand economy"),
+      T("牌要整，心要静，乱中取胜。","Tidy hand, calm mind, win in chaos."),
+      T("记牌如记账，心中有数。","Count cards like accounts, know your numbers."),
+      T("大单压顶，小单溜边。","Big singles press, small ones slip the side."),
+      T("残局留王，关键时刻翻盘。","Keep the Joker for the endgame comeback."),
+      T("对手剩单，坚决不给他接风。","Opponent has one card, never let follow-wind."),
+      T("对家要风，全力送风。","Partner wants the wind, send it with all."),
+      T("炸弹是底牌，不是常规武器。","Bomb is a trump, not a regular weapon."),
+      T("顺子要连，断了就废。","Straight must connect, break it and it's wasted."),
+      T("进了贡，心态不能崩。","After tribute, don't break composure."),
+      T("头游靠抢，二游靠稳。","First place by seizing, second by steadiness."),
+      T("牌差不慌，等对手失误。","Bad hand, stay calm, wait for mistake."),
+      T("控牌权比出牌更重要。","Holding lead matters more than playing."),
+      T("小对子铺路，大对子收口。","Small pairs pave, big pairs close."),
+      T("会忍牌的人，才配赢牌。","Those who wait deserve to win."),
+      T("逢人配是金，用在刀刃上。","Wild card is gold, use it on the edge."),
+      T("算准返贡，才能反客为主。","Time the return tribute to turn tables.")
   ],
   slang:[  // 诙谐行话 / 术语（对手多用，做调侃）
     T("枪不打四，你还真打", "Do not fire at four, yet you did"),T("逢人配都不懂用，可惜了", "Do not even know how to use the wild card, what a pity"),T("这波叫“撂荒”，牌拆稀碎", "This is called \"abandoning the field\", hand in pieces"),
@@ -2046,7 +2113,19 @@ const CHAT = {
     T("二游卡位，死守不退", "Second place holds position, defends to the end"),T("赢牌“嘚瑟”，气死对手", "Winning \"swagger\", infuriating opponent"),T("出错就“圆牌”，强行解释", "Mistake then \"rounding the cards\", forced explanation"),
     T("死攥大王，最后“憋王”翻盘", "Clutching the big Joker, final \"suffocating the Joker\" comeback"),T("出错就“甩锅”，对家背锅", "Mistake then \"passing the buck\", partner takes the blame"),T("天王炸镇场，谁敢嚣张", "Joker bomb dominates, who dares act up"),
     T("这手牌“两头晃”，机动性拉满", "This hand \"swings both ways\", maximum mobility"),T("借风一波，对家接风起飞", "Ride the wind, partner follows"),T("抗贡成功，双王护体", "Resist tribute success, two Jokers protect"),
-    T("双下惨案，两人垫底", "Double-down tragedy, both at the bottom"),T("听牌了？余一手出不去咯", "Listening to your hand? One card left you cannot play"),T("高单压你没商量", "High single presses you no discussion"),T("跳张压制，级差拉满", "Jump-rank pressure, max level gap")
+    T("双下惨案，两人垫底", "Double-down tragedy, both at the bottom"),T("听牌了？余一手出不去咯", "Listening to your hand? One card left you cannot play"),T("高单压你没商量", "High single presses you no discussion"),T("跳张压制，级差拉满", "Jump-rank pressure, max level gap"),
+      T("这叫'闷头炸'，出其不意。","This is a 'silent bomb', unexpected."),
+      T("经典'跟牌'，被人牵着鼻子走。","Classic 'following', led by the nose."),
+      T("一记'回马枪'，绝杀。","A 'backward spear', lethal finish."),
+      T("'卡脖'压制，对手喘不过气。","'Throat-lock' pressure, opponent can't breathe."),
+      T("这手'滚雪球'，越滚越大。","This 'snowball', grows bigger."),
+      T("学会'读牌'，对手无所遁形。","Learn to 'read cards', opponent exposed."),
+      T("'抢风'成功，节奏在我手。","'Seize the wind' success, rhythm in my hand."),
+      T("这叫'连环套'，环环相扣。","This is 'chain links', interlocked."),
+      T("'钓鱼'失败，反被将一军。","'Fishing' failed, checkmated instead."),
+      T("一手'空城计'，吓退对手。","An 'empty fort', scares opponent off."),
+      T("'暗渡陈仓'，偷渡一手。","'Secret crossing', sneak a play."),
+      T("这波'声东击西'，妙啊。","This 'feint east strike west', brilliant.")
   ]
 };
 const CHAT_DURATION = 4800;       // 对话气泡显示时长（上一版的 2400ms 延长一倍）
@@ -2088,7 +2167,19 @@ const IDLE_LIB = {
     T("残局要留好炸弹、控住大单，才能稳稳赢。", "In endgame keep bombs and control big singles to win steadily."),
     T("记牌是高手的基本功，重点记王、级牌、2、A和断张。", "Card counting is a masters basic skill: remember Jokers, rank cards, 2s, As and gaps."),
     T("逢人配优先去配顺子、连对、钢板，别轻易当单牌出。", "Use the wild card for straights, consecutive pairs, plates; do not waste it as a single."),
-    T("对手剩五张时，要坚决开枪用炸弹压制。", "When opponent has five cards, fire the bomb to suppress.")
+    T("对手剩五张时，要坚决开枪用炸弹压制。", "When opponent has five cards, fire the bomb to suppress."),
+      T("掼蛋里红桃级牌是百搭，能顶任意牌。","In GuanDan the Heart rank is wild, substitutes any card."),
+      T("上游和下游要进贡还贡，是特色环节。","Winner and loser tribute and return, a signature phase."),
+      T("打A时若两家都过A，则重新定级。","When playing A, if both pass A, re-rank."),
+      T("同花顺大于五张炸，小于六张炸。","Straight flush beats five-bomb, loses to six-bomb."),
+      T("级牌从2打到A，每升一级换主牌。","Rank goes 2 to A, each level changes the trump."),
+      T("一家出完，对家可接风继续出。","When one finishes, partner may follow-wind."),
+      T("炸弹可压任何非炸弹牌型。","A bomb beats any non-bomb combo."),
+      T("四王同出是天王炸，最大无解。","Four Jokers is the Joker Bomb, biggest, unbeatable."),
+      T("三连对、钢板都有固定张数要求。","Consecutive pairs and plates have fixed counts."),
+      T("残局讲究留控牌，别把大牌早早打光。","Endgame keeps control cards, don't spend big early."),
+      T("逢人配不宜当单张，浪费了。","Wild card as single is a waste."),
+      T("进贡要把最大牌给头游，还贡随意。","Tribute your biggest to winner, return is free.")
   ],
   features:[  // 本软件功能（单句；a 缩放 / b 拖动 重点多说 → 重复出现提高权重）
     T("按 Ctrl 加鼠标滚轮，可以缩放整个牌桌界面的大小。", "Hold Ctrl and scroll the mouse wheel to zoom the whole table."),
@@ -2110,7 +2201,19 @@ const IDLE_LIB = {
     T("右键或菜单可以暂停存档退出。", "Right-click or menu to pause and save then quit."),
     T("顺子、连对、钢板的长度都符合国家标准固定长度。", "Straight, consecutive pairs, plate lengths follow national fixed lengths."),
     T("牌面用黑体大字，大王红“大”、小王黑“小”，百搭牌有品红描边。", "Cards use bold big font; Big Joker red \"Big\", Small Joker black \"Small\"; wild card has a magenta outline."),
-    T("进天梯后每关都有独立的进度存档，进关自动继续。", "After entering Ladder, each level has independent save; resume on entry.")
+    T("进天梯后每关都有独立的进度存档，进关自动继续。", "After entering Ladder, each level has independent save; resume on entry."),
+      T("菜单里能切换中文、英文、法文三种语言。","Menu switches Chinese, English, French."),
+      T("天梯每关难度递增，从轻松到地狱。","Ladder levels rise in difficulty, easy to hell."),
+      T("随便来一把能选对门和对手的档次。","Quick Play picks partner and opponent tier."),
+      T("无限随机刷榜会自动升级对手强度。","Endless Rank auto-scales opponent strength."),
+      T("理牌后用 ctrl 加滚轮可缩放整桌。","After arranging, Ctrl+wheel zooms the table."),
+      T("出牌有音效，同花顺还有专属旋律。","Plays have sound, straight flush a special tune."),
+      T("牌桌四角能看到各家余牌数。","Table corners show each remaining count."),
+      T("暂停菜单可随时存档退出再回来。","Pause menu saves and quits, resume later."),
+      T("技能栏有悔牌、看已出牌、快进等辅助。","Skill bar has undo, show-played, fast-forward."),
+      T("设定里可重置新手教程与剧情进度。","Settings reset tutorial and story progress."),
+      T("头像旁会显示当前对局的名次进度。","Avatar shows current rank progress."),
+      T("手机竖屏下界面会自动紧凑排版。","Phone portrait auto-compacts the layout.")
   ],
   experience:[  // 掼蛋经验（我方随机说）
     T("小单先出，大单控场，这是掼蛋的基本功。", "Lead small singles, control with big ones; that is the basics."),
@@ -2136,7 +2239,19 @@ const IDLE_LIB = {
     T("残局手里攥着逢人配，比攥着炸弹还踏实。", "In endgame, holding the wild card feels safer than holding a bomb."),
     T("对手连出小对子，八成是在试探你的大牌。", "Opponent playing small pairs repeatedly is probably probing your big cards."),
     T("自己缺哪门花色，对手多半攥着那门的断张。", "The suit you lack, opponent likely holds the gap of."),
-    T("想走上游，先把对家当自己人，别各打各的。", "To take first place, treat partner as your own; do not play separately.")
+    T("想走上游，先把对家当自己人，别各打各的。", "To take first place, treat partner as your own; do not play separately."),
+      T("先出杂牌，把整齐的牌留到最后。","Play clutter first, keep tidy hand for last."),
+      T("对手剩两张，多半在等一张单。","Opponent with two cards waits a single."),
+      T("对家要啥我给啥，绝不当路。","Give partner what they need, never block."),
+      T("手里留张王，关键时刻能翻盘。","Keep a Joker, turn the table at the crunch."),
+      T("小炸早用抢权，大炸晚用定局。","Small bomb early for lead, big bomb late to seal."),
+      T("顺子别拆，拆了就废一半。","Don't break a straight, half is wasted."),
+      T("残局算准返贡，反客为主。","Time the return tribute, flip to host."),
+      T("对手连出对子，多半在清手。","Opponent playing pairs is clearing hand."),
+      T("自己缺的门，对手多半捏着。","The suit you lack, opponent likely holds."),
+      T("想上游就别贪，稳扎稳打。","Want first? Don't be greedy, steady wins."),
+      T("接风要快，别让对手喘气。","Follow-wind fast, don't let opponent breathe."),
+      T("牌路要活，随机应变最要紧。","Flexible play, adapt is key.")
   ],
   general:[  // 轻松闲聊（其他三家也可说，求有趣、有内容）
     T("我这手牌，红桃逢人配正好能接上，心里美滋滋。", "My hand, the Heart wild just fits; feeling great."),
@@ -2152,7 +2267,19 @@ const IDLE_LIB = {
     T("你说巧不巧，我刚想出顺子你就铺好了。", "Funny how I was about to play a straight and you laid it out."),
     T("这把牌风不错，稳扎稳打，不贪不慌。", "Good card flow this round; steady, no greed, no panic."),
     T("天王炸这种宝贝，得留到节骨眼上才亮。", "A Joker Bomb is a treasure; save it for the crunch."),
-    T("咱俩这默契，对面看了都得摇头。", "Our chemistry, the opponents across must be shaking heads.")
+    T("咱俩这默契，对面看了都得摇头。", "Our chemistry, the opponents across must be shaking heads."),
+      T("掼蛋一上手，时间过得飞快。","Once you start GuanDan, time flies."),
+      T("这把运气不错，牌风顺得很。","Lucky this round, card flow is smooth."),
+      T("对家别急，咱慢慢耗死他们。","Partner don't rush, we'll outlast them."),
+      T("刚那手我差点笑出声。","That move almost made me laugh."),
+      T("对手脸都绿了，哈哈。","Opponent's face is green, haha."),
+      T("一局掼蛋，半局心理战。","Half of GuanDan is mind games."),
+      T("这牌我要是赢了，得请自己吃顿好的。","If I win, treat myself nice."),
+      T("手气这东西，说来就来。","Luck comes when it comes."),
+      T("咱俩配合，对面只能干瞪眼。","Our teamwork, opponents can only stare."),
+      T("牌桌上见人品，哈哈。","Table reveals character, haha."),
+      T("这把稳了，坐等对手投降。","This one's won, waiting for surrender."),
+      T("掼蛋配茶，人生一乐。","GuanDan with tea, a life's joy.")
   ]
 };
 let idleChatTimer = null, idleChatRoundTimer = null, idleChatActive = false;
@@ -2678,19 +2805,40 @@ function cardEl(card){
   el.className = 'card';
   el.__card = card;
   if(isJoker(card)){
-    const color = card.suit==='Y' ? '#7b2fd0' : '#1a8f3c';   // 「大」紫 / 「小」绿
-    const wmColor = color;                                   // 衬底「王」字跟随同色（如需保留红/黑改这里）
-    el.classList.add(card.suit==='Y' ? 'jokerBig' : 'jokerSmall');
+    const isBig = card.suit==='Y';
+    el.classList.add(isBig ? 'jokerBig' : 'jokerSmall');
     const wm = document.createElement('span');             // 牌面下方衬 50% 淡显「王」字背景，撑满方格
     wm.className = 'joker-watermark';
-    wm.textContent = T("王", "JOKER");
-    wm.style.color = wmColor;
+    const wmText = T("王", "JOKER");
+    if(isBig){                                              // 大王：红黄蓝绿四色竖切混合
+      const cols=['#e23a3a','#f2c200','#2b6cff','#1faa3a'];
+      const clips=['inset(0 75% 0 0)','inset(0 50% 0 25%)','inset(0 25% 0 50%)','inset(0 0 0 75%)'];
+      cols.forEach(function(c,i){
+        const sp=document.createElement('span');
+        sp.textContent=wmText;
+        sp.style.position='absolute'; sp.style.inset='0';
+        sp.style.display='flex'; sp.style.alignItems='center'; sp.style.justifyContent='center';
+        sp.style.color=c;
+        sp.style.setProperty('-webkit-clip-path', clips[i]);
+        sp.style.setProperty('clip-path', clips[i]);
+        wm.appendChild(sp);
+      });
+    } else {                                                // 小王：黑+灰竖切混合
+      const cols=['#111111','#9a9a9a'];
+      const clips=['inset(0 50% 0 0)','inset(0 0 0 50%)'];
+      cols.forEach(function(c,i){
+        const sp=document.createElement('span');
+        sp.textContent=wmText;
+        sp.style.position='absolute'; sp.style.inset='0';
+        sp.style.display='flex'; sp.style.alignItems='center'; sp.style.justifyContent='center';
+        sp.style.color=c;
+        sp.style.setProperty('-webkit-clip-path', clips[i]);
+        sp.style.setProperty('clip-path', clips[i]);
+        wm.appendChild(sp);
+      });
+    }
     el.appendChild(wm);
-    const span = document.createElement('span');
-    span.className = 'rank-num joker-num';
-    span.textContent = card.suit==='Y' ? T("大", "BIG") : T("小", "SMALL");
-    span.style.color = color;
-    el.appendChild(span);
+
   } else {
     el.style.color = SUIT_COLOR[card.suit];
     el.innerHTML = '<span class="suit-glyph">'+SUIT_GLYPH[card.suit]+'</span><span class="rank-num">'+rankText(card)+'</span>';
@@ -2864,8 +3012,9 @@ function renderCounts(){
     const doneTag = seat.querySelector('.done');
     if(doneTag) doneTag.remove();
     if(S.finished.includes(p)){
+      const idx = S.finished.indexOf(p);            // 0=头游 1=二游 2=三游 3=板油
       const sp = document.createElement('span');
-      sp.className = 'done'; sp.textContent = T("已完牌", "DONE");
+      sp.className = 'done rankname'; sp.textContent = RANK_DONE[idx] || '';
       seat.appendChild(sp);
     }
   }
@@ -2900,6 +3049,8 @@ function renderTurnUI(){
   const mine = S.currentPlayer===0;
   $('btnPlay').disabled = !mine;
   $('btnPass').disabled = !mine || !S.lastPlay;
+  $('btnUndo').disabled = !(mine && undoSnap && !undoUsed);
+  $('btnRedeal').disabled = !mine;   // 5.1.0：重新发牌仅玩家回合可用  // 5.0.1：悔牌仅在玩家回合且本局出牌后未用时可用
   updateClearSelButton();
 }
 function quadEl(p){ return $('quad'+p); }
@@ -2915,7 +3066,7 @@ function renderTablePlay(p, cards, combo){
     qc.appendChild(g);
   });
   // 三带二：一律分两排——上排放三个头、下排放对子
-  if(combo.type==='threeTwo'){ qc.style.flexDirection='column'; qc.style.alignItems='center'; }
+  if(combo.type==='threeTwo' || combo.type==='gangBan'){ qc.style.flexDirection='column'; qc.style.alignItems='center'; }
   else { qc.style.flexDirection=''; qc.style.alignItems=''; }
   qt.textContent = combo.name;
 }
@@ -3177,6 +3328,8 @@ function onPlay(){
   if(!combo){ toast(T("所选的牌不构成合法牌型", "The selected cards don\\'t form a valid combo")); return; }
   if(S.lastPlay && !canBeat(combo, S.lastPlay.combo)){ toast(T("大不过上家的 ", "Can\\'t beat the last play by ")+S.lastPlay.combo.name); return; }
   if(S.mode==='tutorial' && !tutorialPlayerCheck(cards, combo, false)) return;
+  undoSnap = snapshotState();                                 // 5.0.1：悔牌——快照玩家出牌前完整状态
+  undoUsed = false;
   S.selected.clear();
   doAction(0, cards);
 }
@@ -3184,7 +3337,37 @@ function onPass(){
   if(S.phase!=='play' || S.currentPlayer!==0) return;
   if(!S.lastPlay){ toast(T("这一轮你先出，必须出牌", "You lead this round — you must play")); return; }
   if(S.mode==='tutorial' && !tutorialPlayerCheck(null, null, true)) return;
+  undoSnap = snapshotState(); undoUsed = false;       // 5.0.1：过牌同样可被悔牌回退到过牌前
   doAction(0, null);
+}
+/* ============ 5.0.1：技能·悔牌（玩家每次出牌后最多回退1次） ============ */
+let undoSnap = null, undoUsed = false;
+// 5.0.1-fix：自带容错深拷贝，避免 structuredClone 在旧手机 WebView 不支持或遇不可克隆字段时抛错导致出牌失效
+function deepCloneState(o){
+  if(o===null || o===undefined) return o;
+  const t = typeof o;
+  if(t==='function' || t==='symbol') return undefined;   // 丢弃不可克隆项（函数/DOM 引用保留在 S 本体）
+  if(t!=='object') return o;                              // 原始值（number/string/boolean）
+  if(o instanceof Set) return new Set([...o].map(deepCloneState));
+  if(o instanceof Map) return new Map([...o].entries().map(([k,v])=>[deepCloneState(k),deepCloneState(v)]));
+  if(o instanceof Date) return new Date(o.getTime());
+  if(typeof o.nodeType === 'number') return undefined;    // DOM 节点 → 丢弃
+  if(Array.isArray(o)) return o.map(deepCloneState);
+  const out = {};
+  for(const k in o){ const v = deepCloneState(o[k]); if(v!==undefined || o[k]===undefined) out[k]=v; }
+  return out;
+}
+function snapshotState(){ return deepCloneState(S); }                    // 深拷贝当前牌局（含 Set：dif/selected）
+function restoreState(snap){ for(const k in snap){ S[k] = snap[k]; } }   // const S 不可重赋值，逐字段还原
+function resetUndo(){ undoSnap = null; undoUsed = false; }
+function onUndo(){
+  if(!undoSnap || undoUsed || S.phase!=='play') return;
+  S.gameId++;                                                  // 作废任何挂起的 AI 计时器
+  restoreState(undoSnap);
+  undoUsed = true; undoSnap = null;                            // 用过即作废：每次出牌最多1次悔牌
+  renderTableFromState(); renderHandFromSlots(); renderCounts(); renderHist(); renderTurnUI();
+  beginTurn();
+  toast(T('已悔牌，回到你上一次出牌之前','Undo: reverted to before your last play'), 1700);
 }
 function doAction(p, cards){
   // 法宝·护蛋壳（P6）：对手炸弹砸向我方（你/对门）时，首次化解
@@ -3340,6 +3523,7 @@ function endRound(){
   showRoundModal(order, advance, winTeam, oldLv, S[key]);
 }
 const RANK_CN = [T("头游", "1st"),T("二游", "2nd"),T("三游", "3rd"),T("末游", "Last")];
+const RANK_DONE = ['头游','二游','三游','板油'];   // 5.0.1：完牌名次（板油=末游俗称）
 function showRoundModal(order, advance, winTeam, oldLv, newLv){
   let body = '';
   order.forEach((p,i)=>{
@@ -3938,7 +4122,7 @@ function startTutorial(idx){
 function startTutorialRound(tut){
   S.gameId++; S.round=1;
   S.hands=[[],[],[],[]]; S.finished=[]; S.lastPlay=null; S.passes=0; S.trickWinner=null;
-  S.selected.clear(); S.played=[[],[],[],[]]; S.firstLeader=0; S.phase='dealing';
+  S.selected.clear(); S.played=[[],[],[],[]]; S.firstLeader=0; S.phase='dealing'; resetUndo();   // 5.0.1：每局发牌重置悔牌
   S.table=[null,null,null,null]; clearTable();
   S.hands = mkHands(tut.hands);
   S.drawCard = S.hands[0][0];
@@ -4137,8 +4321,52 @@ function dealAnimation(){                      // 一张一张发，飞向四家
     const {p, card} = seq[step++];
     flyToSeat(p);
     if(p===0) spawnCardInSlot(S.slotIndexOf[card.id], card, true);
-    setTimeout(next, 26);
+    setTimeout(next, 13);   // 5.0.1：发牌速度翻倍（26→13）
   })();
+}
+function dealAnimationRedeal(){                 // 重新发牌：发牌动画结束后直接进入出牌（不重走上贡流程）
+  const gid = S.gameId;
+  const seq = [];
+  for(let i=0;i<108;i++){ const p=i%4; seq.push({p, card:S.hands[p][(i-p)/4]}); }
+  let step = 0;
+  (function next(){
+    if(gid!==S.gameId) return;
+    if(step>=seq.length){ setTimeout(function(){ if(gid!==S.gameId) return; beginPlay([]); }, 80); return; }
+    const {p, card} = seq[step++];
+    flyToSeat(p);
+    if(p===0) spawnCardInSlot(S.slotIndexOf[card.id], card, true);
+    setTimeout(next, 13);
+  })();
+}
+function redealRound(){                          // 技能·重新发牌：本局重发，不重置整场（保留打几/关卡/进度）
+  if(S.phase==='over') return;
+  S.gameId++;                                   // 取消任何挂起的发牌/AI 计时器
+  S.hands = [[],[],[],[]];
+  S.finished = [];
+  S.lastPlay = null;
+  S.passes = 0;
+  S.trickWinner = null;
+  S.selected.clear();
+  S.played = [[],[],[],[]];
+  S.firstLeader = 0;
+  S.phase = 'dealing';
+  S.table = [null,null,null,null];
+  clearTable();
+  const deck = shuffle(buildDeck());
+  S.drawCard = deck[Math.floor(Math.random()*deck.length)];
+  for(let i=0;i<108;i++) S.hands[i%4].push(deck[i]);
+  applySortMode();
+  buildLayout();
+  initGrid();
+  renderHeader();
+  renderCounts();
+  for(let p=1;p<=3;p++) $('cnt'+p).textContent = '…';
+  $('deck').style.display = 'block';
+  $('deck2').style.display = 'block';
+  renderCenterMark();
+  renderTurnUI();
+  $('centerMsg').textContent = T("重新发牌…", "Re-dealing…");
+  dealAnimationRedeal();
 }
 function flyToSeat(p){                          // 发牌飞向各玩家的动画
   try{
@@ -4151,8 +4379,8 @@ function flyToSeat(p){                          // 发牌飞向各玩家的动�
     const ex = seat.left+seat.width/2, ey = seat.top+seat.height/2;
     g.animate([{transform:'translate('+sx+'px,'+sy+'px) scale(1)', opacity:.95},
                {transform:'translate('+ex+'px,'+ey+'px) scale(.5)', opacity:.4}],
-              {duration:300, easing:'ease-in'});
-    setTimeout(()=>g.remove(), 320);
+              {duration:150, easing:'ease-in'});   // 5.0.1：飞牌动画同步减半
+    setTimeout(()=>g.remove(), 170);
   }catch(e){}
 }
 function finishDeal(){
@@ -4347,6 +4575,7 @@ function stopGame(){
   S.gameId++;            // 使任何挂起的 AI 计时器失效
   S.phase = 'idle';
   $('menuPop').style.display = 'none';
+  hideTutTeach();        // 5.0.1：退出牌局（含教程存档退出）时强制隐藏教学要点提示框，避免残留到其他模式
 }
 function showMainMenu(){
   clearStoryPersonas();
@@ -4833,6 +5062,14 @@ function applyStoryPersonas(node){
   setSeatCharName(1, om?om.name:'');
   setSeatCharName(2, pm?pm.name:'');
   setSeatCharName(3, os?os.name:'');
+}
+function saveAndReturnToParent(){
+  try{ const m=document.getElementById('menuPop'); if(m) m.style.display='none'; }catch(e){}
+  if(S.mode==='story'){ storySaveAndExit(); return; }
+  if(S.mode==='tutorial'){ stopGame(); openTutorialSelect(); return; }
+  if(S.mode==='ladder'){ saveLadderGame(); stopGame(); buildLadderLevels(); $('ladderOverlay').classList.add('show'); return; }
+  if(S.mode==='endless'){ saveGame(); stopGame(); showMainMenu(); return; }
+  stopGame(); showMainMenu();   // 随便来一把等无存档模式：直接返回主菜单
 }
 function storySaveAndExit(){
   saveStorySave();          // 保存当前剧情进度（已通关小节 / 携带法宝）
@@ -5933,7 +6170,7 @@ $('btnTutorial').addEventListener('click', openTutorialSelect);
 $('btnStory').addEventListener('click', openStoryMenu);
 $('storyBackMain').addEventListener('click', ()=>{ $('storyMenu').classList.remove('show'); showMainMenu(); });
 $('storyDetailBack').addEventListener('click', ()=>{ openStoryMenu(); });
-$('btnStoryQuit').addEventListener('click', storySaveAndExit);
+$('btnStoryQuit').addEventListener('click', saveAndReturnToParent);
 /* 4.1.0 交互场景：返回章节 / 完成本节 */
 $('scBack').addEventListener('click', function(){
   $('storyScene').classList.remove('show');
@@ -6036,7 +6273,7 @@ $('difInfoResetStory').addEventListener('click', ()=>{
   }
 });
 /* 顶右控制 */
-$('btnExitMenu').addEventListener('click', ()=>{ S.quickPartnerTier=undefined; S.quickOppTier=undefined; stopGame(); showMainMenu(); });   // 随便来一把：不存档，退出清档位
+$('btnExitMenu').addEventListener('click', saveAndReturnToParent);
 /* 语言切换：顶栏下拉 + 开始页按钮组 */
 (function(){
   var sel=document.getElementById('selLang');
@@ -6054,11 +6291,9 @@ $('btnExitMenu').addEventListener('click', ()=>{ S.quickPartnerTier=undefined; S
     }
   }
   try { translateStatic(); } catch(e){}
-  var vm=document.getElementById('verMark'); if(vm) vm.textContent=(LANG==='en'?'RPG v5.0预告版 — RoundMushroom (Archtect)':(LANG==='fr'?'RPG v5.0预告版 — RoundMushroom (Archtect)':'RPG版 5.0预告版　圆蘑菇Archtect随便捣鼓的'));
+  var vm=document.getElementById('verMark'); if(vm) vm.textContent=(LANG==='en'?'RPG v5.1.0预告版 — RoundMushroom (Archtect)':(LANG==='fr'?'RPG v5.1.0预告版 — RoundMushroom (Archtect)':'RPG版 5.1.0预告版　圆蘑菇Archtect随便捣鼓的'));
 })();
-$('btnMenu').addEventListener('click', ()=>{
-  const m = $('menuPop'); m.style.display = (m.style.display==='none' || !m.style.display) ? 'flex' : 'none';
-});
+$('btnMenu').addEventListener('click', saveAndReturnToParent);
 $('menuSaveExit').addEventListener('click', ()=>{   // 暂停存档退出
   $('menuPop').style.display='none';
   if(S.mode==='tutorial'){ stopGame(); showMainMenu(); return; }
@@ -6079,6 +6314,8 @@ $('menuBack').addEventListener('click', ()=>{        // 返回上级菜单 / 天
   else if(S.mode==='ladder'){ stopGame(); buildLadderLevels(); $('ladderOverlay').classList.add('show'); }
 });
 $('btnPlay').addEventListener('click', onPlay);
+$('btnUndo').addEventListener('click', onUndo);
+$('btnRedeal').addEventListener('click', redealRound);   // 5.1.0：技能·重新发牌   // 5.0.1：技能·悔牌
 $('btnPass').addEventListener('click', onPass);
 $('btnClearSel').addEventListener('click', ()=>{
   if(S.phase==='play'){ if(S.currentPlayer!==0) return; }
